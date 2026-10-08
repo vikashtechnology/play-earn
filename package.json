@@ -9,6 +9,7 @@
   "scripts": {
     "build": "npm run build:api && npm run build:validation",
     "dev:api": "npm --workspace @rewards-platform/api run dev",
+    "config:check": "npm --workspace @rewards-platform/api run config:check",
     "neon:login": "neonctl auth",
     "neon:setup": "neonctl projects create --name play-earn --region-id aws-ap-southeast-1",
     "neon:link": "neonctl projects link",

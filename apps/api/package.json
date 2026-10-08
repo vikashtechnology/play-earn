@@ -10,7 +10,8 @@
     "test": "node --test \"src/**/*.test.js\"",
     "migrate": "node scripts/run-migrations.js",
     "migrate:check": "node scripts/run-migrations.js --check",
-    "smoke:identity": "node scripts/smoke-identity.js"
+    "smoke:identity": "node scripts/smoke-identity.js",
+    "config:check": "node scripts/check-config.js"
   },
   "dependencies": {
     "pg": "^8.23.1"

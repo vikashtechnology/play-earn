@@ -8,7 +8,7 @@ import {
 } from '@rewards-platform/validation';
 import { createIdentityRepository } from '../db/identityRepository.js';
 import { pool } from '../db.js';
-import { config, isFirebaseAuthConfigured } from '../config.js';
+import { config, isFirebaseAuthConfigured, isPlaceholderValue, isPublishedPolicyUrl } from '../config.js';
 import { createFirebaseTokenVerifier } from '../services/firebaseAuth.js';
 import {
   AccountConflictError,
@@ -74,8 +74,16 @@ function buildIdentityService(authConfig = config) {
 
 const identityService = buildIdentityService(config);
 
+// Sign-in stays closed until the versions AND real published pages exist. An
+// .env.example URL such as https://your-domain.example/terms does not count:
+// recording consent against a page nobody can read is not consent.
 function hasPublishedPolicies(authConfig = config) {
-  return Boolean(authConfig.termsVersion && authConfig.privacyVersion && authConfig.termsUrl && authConfig.privacyUrl);
+  return Boolean(
+    !isPlaceholderValue(authConfig.termsVersion)
+    && !isPlaceholderValue(authConfig.privacyVersion)
+    && isPublishedPolicyUrl(authConfig.termsUrl)
+    && isPublishedPolicyUrl(authConfig.privacyUrl),
+  );
 }
 
 // Firebase sign-in also creates accounts, so it stays fail-closed until the

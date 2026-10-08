@@ -13,7 +13,8 @@ function readConfig(env) {
   ], {
     cwd: apiRoot,
     encoding: 'utf8',
-    env: { ...process.env, ...env },
+    // Ignore apps/api/.env so a developer's real configuration cannot leak in.
+    env: { ...process.env, ...env, CONFIG_SKIP_ENV_FILE: '1' },
   });
 
   assert.equal(result.status, 0, result.stderr);
@@ -91,4 +92,67 @@ test('config keeps no Supabase credentials and defaults the OTP hash secret', ()
   assert.equal(config.supabaseServiceRoleKey, undefined);
   assert.equal(JSON.stringify(config).includes('legacy-anon-key'), false);
   assert.equal(config.otpHashSecret, 'jwt-secret-value');
+});
+
+function readHelpers(env) {
+  const result = spawnSync(process.execPath, [
+    '--input-type=module',
+    '-e',
+    "import { config, isPlaceholderValue, isPublishedPolicyUrl } from './src/config.js';"
+    + ' console.log(JSON.stringify({ policiesPublished: config.policiesPublished, firebaseProjectId: config.firebaseProjectId,'
+    + ' googleWebClientId: config.googleWebClientId }));',
+  ], {
+    cwd: apiRoot,
+    encoding: 'utf8',
+    // Ignore apps/api/.env so a developer's real configuration cannot leak in.
+    env: { ...process.env, ...env, CONFIG_SKIP_ENV_FILE: '1' },
+  });
+
+  assert.equal(result.status, 0, result.stderr);
+  return JSON.parse(result.stdout.trim());
+}
+
+test('example placeholders collapse to empty so they cannot enable a feature', () => {
+  const values = readHelpers({
+    FIREBASE_PROJECT_ID: 'your-firebase-project-id',
+    GOOGLE_WEB_CLIENT_ID: 'configure-google-oauth-web-client-id',
+  });
+
+  assert.equal(values.firebaseProjectId, '');
+  assert.equal(values.googleWebClientId, '');
+});
+
+test('policy pages on reserved or example hosts count as unpublished', () => {
+  const unpublished = [
+    '',
+    'https://your-domain.example/terms',
+    'https://playearn.example/terms',
+    'https://example.com/terms',
+    'http://playearn.in/terms',
+    'https://localhost/terms',
+    'https://playearn.invalid/terms',
+    'not a url',
+  ];
+  for (const url of unpublished) {
+    const values = readHelpers({ TERMS_URL: url, PRIVACY_URL: 'https://playearn.in/privacy' });
+    assert.equal(values.policiesPublished, false, `${url || '(empty)'} must not count as published`);
+  }
+
+  const published = readHelpers({
+    TERMS_URL: 'https://playearn.in/terms',
+    PRIVACY_URL: 'https://playearn.in/privacy',
+  });
+  assert.equal(published.policiesPublished, true);
+});
+
+test('placeholder and policy-url helpers are exported for the config doctor', async () => {
+  const { isPlaceholderValue, isPublishedPolicyUrl } = await import('./config.js');
+
+  assert.equal(isPlaceholderValue('replace-with-a-long-random-secret'), true);
+  assert.equal(isPlaceholderValue('your-firebase-project-id'), true);
+  assert.equal(isPlaceholderValue('configure-after-fast2sms-and-DLT-approval'), true);
+  assert.equal(isPlaceholderValue(''), true);
+  assert.equal(isPlaceholderValue('play-earn-prod'), false);
+  assert.equal(isPublishedPolicyUrl('https://playearn.in/terms'), true);
+  assert.equal(isPublishedPolicyUrl('https://playearn.example/terms'), false);
 });

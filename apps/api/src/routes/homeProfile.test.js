@@ -11,10 +11,10 @@ const testConfig = {
   jwtSecret: TEST_JWT_SECRET,
   termsVersion: 'terms-2026-10-01',
   privacyVersion: 'privacy-2026-10-01',
-  termsUrl: 'https://playearn.example/terms',
-  privacyUrl: 'https://playearn.example/privacy',
+  termsUrl: 'https://playearn.in/terms',
+  privacyUrl: 'https://playearn.in/privacy',
   supportEmail: 'support@playearn.example',
-  accountDeletionUrl: 'https://playearn.example/delete-account',
+  accountDeletionUrl: 'https://playearn.in/delete-account',
 };
 
 function createMockResponse() {
@@ -158,7 +158,7 @@ test('profile route returns the Neon-backed identity, consent, and payout state'
   assert.equal(result.body.preferences.personalizedOffersOptIn, true);
   assert.equal(result.body.consent.refreshRequired, false);
   assert.equal(result.body.support.email, 'support@playearn.example');
-  assert.equal(result.body.accountDeletion.url, 'https://playearn.example/delete-account');
+  assert.equal(result.body.accountDeletion.url, 'https://playearn.in/delete-account');
   assert.equal(result.body.accountDeletion.available, false);
 });
 
@@ -180,7 +180,7 @@ test('profile route describes the signed-out state without a database round trip
   assert.equal(result.body.signedIn, false);
   assert.equal(result.body.user, null);
   assert.equal(result.body.referral, null);
-  assert.equal(result.body.consent.termsUrl, 'https://playearn.example/terms');
+  assert.equal(result.body.consent.termsUrl, 'https://playearn.in/terms');
   assert.deepEqual(result.dependencies.balancesCalls, []);
 });
 

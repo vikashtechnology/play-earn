@@ -30,8 +30,8 @@ const enabledAuthConfig = {
   minimumUserAge: 18,
   termsVersion: 'terms-2026-10-01',
   privacyVersion: 'privacy-2026-10-01',
-  termsUrl: 'https://playearn.example/terms',
-  privacyUrl: 'https://playearn.example/privacy',
+  termsUrl: 'https://playearn.in/terms',
+  privacyUrl: 'https://playearn.in/privacy',
   supportEmail: 'support@playearn.example',
   jwtSecret: TEST_JWT_SECRET,
   otpHashSecret: 'auth-route-hash-secret',
@@ -182,6 +182,42 @@ test('Firebase session exchange is disabled until the project and policies are c
 
   assert.equal(result.status, 503);
   assert.equal(result.body.code, 'firebase_sign_in_disabled');
+});
+
+test('sign-in stays closed while policy pages or versions are placeholders', async () => {
+  // The .env.example values look configured but point at pages nobody can read.
+  // Recording consent against them would be meaningless, so the gate stays shut.
+  const examplePolicies = {
+    ...enabledAuthConfig,
+    termsUrl: 'https://your-domain.example/terms',
+    privacyUrl: 'https://your-domain.example/privacy',
+  };
+
+  const result = await requestJson('/api/v1/auth/firebase/session', {
+    body: { idToken: 'a.b.c', consent: validConsentBody },
+    authConfig: examplePolicies,
+  });
+  assert.equal(result.status, 503);
+  assert.equal(result.body.code, 'firebase_sign_in_disabled');
+
+  const policies = await requestJson('/api/v1/auth/policies', { method: 'GET', authConfig: examplePolicies });
+  assert.equal(policies.body.firebaseSignInEnabled, false);
+
+  const unpublishedVersion = { ...enabledAuthConfig, termsVersion: 'publish-reviewed-terms-version' };
+  const versionResult = await requestJson('/api/v1/auth/firebase/session', {
+    body: { idToken: 'a.b.c', consent: validConsentBody },
+    authConfig: unpublishedVersion,
+  });
+  assert.equal(versionResult.status, 503);
+  assert.equal(versionResult.body.code, 'firebase_sign_in_disabled');
+
+  // Phone Minimum KYC needs the Firebase project but not the policy pages.
+  const phoneOnly = await requestJson('/api/v1/auth/withdrawal/phone/verify', {
+    method: 'POST',
+    body: { idToken: 'a.b.c' },
+    authConfig: { ...examplePolicies, signupEnabled: false },
+  });
+  assert.notEqual(phoneOnly.body.code, 'firebase_phone_disabled');
 });
 
 test('Firebase session exchange provisions a session and hashes request fingerprints', async () => {
