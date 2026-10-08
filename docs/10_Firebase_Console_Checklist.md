@@ -8,43 +8,40 @@ steps 4–8 are hardening and cleanup.
 
 ---
 
-## Step 0 — Register `com.zivora.app` (blocking)
+## Step 0 — Package registration ✅ done
 
-The committed `apps/android/app/google-services.json` currently registers only
-`package_name: com.playgames.app`. The google-services Gradle plugin matches on
-`applicationId`, so the build fails with:
+The app's `applicationId` and `namespace` are **`com.zivora.app`**, and
+`apps/android/app/google-services.json` registers that exact package
+(`mobilesdk_app_id: 1:41843791180:android:d834f87a38947c189eabe9`). The doctor
+confirms it:
 
+```sh
+npm run config:check     # → ok  Android package matches com.zivora.app
 ```
-No matching client found for package name 'com.zivora.app'
-```
 
-Fix:
+This matters because the google-services Gradle plugin matches the JSON's
+`package_name` against `applicationId`; a mismatch fails the build with
+`No matching client found for package name 'com.zivora.app'`. The applicationId
+is permanent once you publish on Play, so treat `com.zivora.app` as final.
 
-1. **Project settings → Your apps → Add app → Android**.
-2. Package name: `com.zivora.app` (exactly — no `.debug` suffix).
-3. App nickname: `Play & Earn Real Cash`. Debug signing certificate SHA-1: paste
-   it now if you have it (Step 1), otherwise add it later.
-4. **Download `google-services.json`** and replace
-   `apps/android/app/google-services.json`.
-5. Re-run the doctor — the package BLOCK must disappear:
+**Console cleanup still owed:** the project also holds two earlier, now-unused
+Android app registrations — `com.playgames.app` and `com.rewardsplatform.app`.
+Delete both (**Project settings → Your apps → ⋮ → Remove app**) so nobody
+downloads the wrong `google-services.json` later.
 
-   ```sh
-   npm run config:check
-   ```
-
-The new file will contain **two** `client` entries (`com.playgames.app` and
-`com.zivora.app`). That is fine — the plugin selects by
-`applicationId`. Once the app builds, delete the unused `com.playgames.app`
-registration (**Your apps → ⋮ → Remove app**) so nobody wires the wrong one later.
-
-Keep the same `oauth_client` with `client_type: 3` (web client). Credential
-Manager needs it for Google sign-in, and the server reads
-`GOOGLE_WEB_CLIENT_ID` from the same value:
+The web OAuth client is shared across registrations and stays as-is. Credential
+Manager needs it for Google sign-in, and the server reads `GOOGLE_WEB_CLIENT_ID`
+from the same value:
 
 ```
 41843791180-aenmlq2okckiee7ounn3t1bulbh6pacv.apps.googleusercontent.com
 ```
 
+> ⚠️ **Branding:** `app_name` in `app/src/main/res/values/strings.xml` is still
+> "Play & Earn Real Cash", as are the legal pages in `site/` and the docs, while
+> the package is now `com.zivora.app`. If Zivora is the public brand, decide
+> before launch — changing the name inside the published policy pages requires
+> bumping `TERMS_VERSION` and `PRIVACY_VERSION` so the app re-collects consent.
 ---
 
 ## Step 1 — SHA-1 and SHA-256 fingerprints (debug **and** release)
@@ -236,8 +233,10 @@ minted for a different Firebase project), and `phone_verification_required`
 
 ## Tick list
 
-- [ ] `com.zivora.app` registered; new `google-services.json` in `apps/android/app/`
-- [ ] `npm run config:check` shows no package-name BLOCK
+- [x] `com.zivora.app` registered; matching `google-services.json` in `apps/android/app/`
+- [x] `npm run config:check` shows no package-name BLOCK
+- [ ] Stale `com.playgames.app` / `com.rewardsplatform.app` registrations deleted
+- [ ] Public brand name decided (app label + policy pages vs `com.zivora.app`)
 - [ ] Debug SHA-1 **and** SHA-256 added
 - [ ] Release keystore created, backed up offline, fingerprints added
 - [ ] Play App Signing key fingerprints added (if enrolled)
