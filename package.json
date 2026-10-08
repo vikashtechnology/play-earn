@@ -9,6 +9,11 @@
   "scripts": {
     "build": "npm run build:api && npm run build:validation",
     "dev:api": "npm --workspace @rewards-platform/api run dev",
+    "neon:login": "neonctl auth",
+    "neon:setup": "neonctl projects create --name play-earn --region-id aws-ap-southeast-1",
+    "neon:link": "neonctl projects link",
+    "neon:cs": "neonctl connection-string --pooled",
+    "neon:cs:direct": "neonctl connection-string",
     "build:api": "npm --workspace @rewards-platform/api run build",
     "build:validation": "npm --workspace @rewards-platform/validation run build",
     "test": "npm --workspace @rewards-platform/api run test && npm --workspace @rewards-platform/validation run test",
@@ -16,5 +21,8 @@
     "infra:up": "docker compose up --build -d",
     "infra:down": "docker compose down",
     "infra:logs": "docker compose logs -f api postgres redis"
+  },
+  "devDependencies": {
+    "neonctl": "^8.0.12"
   }
 }

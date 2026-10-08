@@ -58,17 +58,52 @@ in the manifest.
 
 ## 2. Neon PostgreSQL
 
-1. Create a project at https://console.neon.tech (Free tier is enough to start).
-2. Copy **two** connection strings:
-   - **Pooled** (`...-pooler.<region>.aws.neon.tech`) → `POSTGRES_URL`
-   - **Direct** (no `-pooler`) → `MIGRATIONS_DATABASE_URL`
-   Both must end with `sslmode=require`. URL-encode special characters in the
-   password.
-3. Put them in `apps/api/.env` (git-ignored):
+Neon is provisioned with the **Neon CLI** (`neonctl`, a root `devDependency`), so
+the whole setup is scriptable. Every command below is also available as an npm
+script.
+
+```sh
+npm install                      # installs neonctl
+
+# 1. Authenticate. Browser sign-in:
+npm run neon:login               # = neonctl auth
+
+# ...or, headless/CI, with an API key from https://console.neon.tech/account/settings/api-keys
+echo "$NEON_API_KEY" | neonctl profile create default --api-key -
+# or per command:  neonctl projects list --api-key "$NEON_API_KEY"
+# or via env:      NEON_API_KEY="$NEON_API_KEY" neonctl projects list
+
+# 2. Create the project. aws-ap-southeast-1 (Singapore) is the closest CLI
+#    region to India; `neonctl projects create --help` lists the others.
+npm run neon:setup               # = neonctl projects create --name play-earn --region-id aws-ap-southeast-1
+
+# 3. Pin the project in the local .neon context (git-ignored) so later commands
+#    do not need --project-id.
+npm run neon:link                # = neonctl projects link
+
+# 4. Read BOTH connection strings.
+npm run neon:cs                  # pooled  -> POSTGRES_URL
+npm run neon:cs:direct           # direct  -> MIGRATIONS_DATABASE_URL
+
+# Optional: inspect health, or open a psql shell
+neonctl inspect
+neonctl psql
+```
+
+Then write them into `apps/api/.env` (git-ignored):
 
 ```sh
 cp apps/api/.env.example apps/api/.env
+# POSTGRES_URL=<pooled string>            (ends -pooler.<region>.aws.neon.tech)
+# MIGRATIONS_DATABASE_URL=<direct string> (no -pooler)
 ```
+
+Both must end with `sslmode=require` (the CLI default) and special characters in
+the password must be URL-encoded.
+
+Prefer the console? Create the project at https://console.neon.tech (Free tier is
+enough to start) and copy the same two strings from **Connect** — pooled for the
+API, direct for migrations.
 
 4. Apply the schema:
 
@@ -96,6 +131,16 @@ auth event trail, then deletes everything it created.
 DDL through Neon's pooler (PgBouncer) can fail on statements that need a
 dedicated session. The API uses the pooled endpoint for normal traffic; the
 migration runner uses the direct endpoint.
+
+### Branches
+
+Use a Neon branch per environment and run migrations against each:
+
+```sh
+neonctl branches create --name dev
+neonctl connection-string dev --pooled      # dev POSTGRES_URL
+neonctl branches reset <branch-id> --parent main   # throwaway test data
+```
 
 ---
 
