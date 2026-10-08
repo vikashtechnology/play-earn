@@ -59,21 +59,40 @@ play-earn/
 
 ```sh
 npm install
-cp apps/api/.env.example apps/api/.env       # set Neon + Firebase values
-# paste the Neon pooled + direct strings into apps/api/.env (console -> Connect)
-npm --workspace @rewards-platform/api run migrate
-npm run config:check                         # validates .env + google-services.json, lists blocking gates
-npm run dev:api                              # http://localhost:4000/api/health
-npm test                                     # 122 unit, route, and SQL tests — no database needed
-npm run build                                # syntax + migration checks
-npm --workspace @rewards-platform/api run smoke:identity   # against real Neon
+
+# Once per machine: builds apps/api/.env (git-ignored, so it never travels with
+# the repo). Firebase values come from the committed google-services.json;
+# JWT_SECRET and OTP_HASH_SECRET are generated locally and never printed.
+npm run setup:env -- \
+  --postgres-url "postgresql://…-pooler…/neondb?sslmode=require" \
+  --migrations-url "postgresql://…/neondb?sslmode=require"
+
+npm run verify:local                         # the whole gauntlet, one command
+npm run verify:local -- --skip-db            # …without needing Neon
 ```
+
+Individually:
+
+```sh
+npm run config:check                         # validates .env + google-services.json, lists blocking gates
+npm test                                     # 131 unit, route, and SQL tests — no database needed
+npm run build                                # syntax + migration checks
+npm --workspace @rewards-platform/api run migrate          # apply schema to Neon
+npm --workspace @rewards-platform/api run smoke:identity   # 27 assertions against real Neon
+npm run smoke:http                           # 21 HTTP routes; nothing may crash the process
+npm run dev:api                              # http://localhost:4000/api/health
+```
+
+`docs/11_Local_Testing.md` is the full local runbook: prerequisites, what each
+stage proves, running the API and the Android app together (the device needs
+`10.0.2.2` or your LAN IP, never `localhost`), why sign-in is closed until the
+policy pages are published, and a troubleshooting table.
 
 `site/` holds the static legal pages the app links to (Terms, Privacy Notice, account deletion), deployable to GitHub Pages by `.github/workflows/pages.yml`; see `site/README.md` for the placeholders that must be filled and the version strings the API expects.
 
 `npm test` covers three layers without any external service: domain and route unit tests, request-schema tests, and `src/db/repository.integration.test.js`, which applies every migration and exercises the real repository SQL against `pg-mem` (an in-memory PostgreSQL emulator). The emulator implements a subset of PostgreSQL, so `scripts/smoke-identity.js` against real Neon remains the authoritative pre-launch check.
 
-Android: open `apps/android` in Android Studio, replace `app/google-services.json` with the real Firebase config, and build with `-PAPI_BASE_URL`, `-PGOOGLE_WEB_CLIENT_ID`, and `-PEMAIL_LINK_URL`.
+Android: open `apps/android` in Android Studio and build with `-PAPI_BASE_URL`, `-PGOOGLE_WEB_CLIENT_ID`, and `-PEMAIL_LINK_URL`. `app/google-services.json` is already the real config for Firebase project `play-f9fe2` and package `com.zivora.app`; console setup is in `docs/10_Firebase_Console_Checklist.md`.
 
 ## Working rules
 

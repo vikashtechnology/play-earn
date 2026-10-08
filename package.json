@@ -11,6 +11,8 @@
     "dev:api": "npm --workspace @rewards-platform/api run dev",
     "config:check": "npm --workspace @rewards-platform/api run config:check",
     "db:verify": "npm run config:check && npm --workspace @rewards-platform/api run migrate && npm --workspace @rewards-platform/api run smoke:identity",
+    "setup:env": "node scripts/setup-env.mjs",
+    "verify:local": "node scripts/verify-local.mjs",
     "smoke:http": "npm --workspace @rewards-platform/api run smoke:http",
     "build:api": "npm --workspace @rewards-platform/api run build",
     "build:validation": "npm --workspace @rewards-platform/validation run build",
