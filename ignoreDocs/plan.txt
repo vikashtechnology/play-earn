@@ -1,0 +1,868 @@
+Play & Earn Real Cash — Complete Compliant Implementation Blueprint
+Version: 2.0 | Date: 2026-10-05 | Market: India-first, Android + Web Admin
+
+Critical Positioning: This app is a rewards marketplace, NOT an "install apps for money" app. Offerwall is one module among many earning methods. All app/game install offers must redirect exclusively to the Google Play Store — no third-party APK sources, no direct APK downloads, no sideloading. AdMob revenue belongs entirely to the platform owner; users receive only non-monetary, in-app coins for watching rewarded ads. Cash/gift-card rewards come exclusively from offerwall/CPE campaigns, completely separated from AdMob.
+
+Table of Contents
+Legal & Regulatory Compliance Framework
+
+Google Play Policy Compliance (Including Play Store-Only Install Rule)
+
+Provider Integrations & Requirements
+
+App UI Architecture
+
+Server Workflow & Backend Architecture
+
+Admin Panel
+
+User Flows
+
+Data Model
+
+API Specification
+
+Financial Model & Unit Economics
+
+Fraud & Abuse Controls
+
+Launch Checklist
+
+References
+
+1. Legal & Regulatory Compliance Framework
+1.1 RBI Prepaid Payment Instrument (PPI) Compliance
+Risk: If coins are purchasable, transferable, or cash-equivalent, they may be classified as a Prepaid Payment Instrument (PPI), requiring RBI authorization. The Draft PPI Directions explicitly clarify that loading of an instrument by digital currency does not constitute loading of a PPI, and reward points/in-game currency are excluded from PPI regulations. Marketplaces issuing loyalty or reward points in their accounts do not require RBI authorization.
+
+Rule	Detail
+Coins are earn-only	Users cannot purchase coins with real money
+Coins are non-transferable	Cannot be sent to other users or converted to cash
+Coins are non-cash-equivalent	Internal rewards unit, not a stored-value wallet
+Cash payouts via regulated provider	RazorpayX/Cashfree Payouts only
+Gift cards via reward provider	Xoxoday/QwikCilver/GyFTR only
+No own INR wallet	Never hold user INR balances
+1.2 DPDP Act 2023 & DPDP Rules 2025
+Requirement	Deadline	Implementation
+Consent managers	13 Nov 2026	Must be Indian company, min net worth ₹2 crore, registered with Data Protection Board
+Core obligations	~Mid-May 2027	Purpose limitation, notice/consent, security safeguards, retention/deletion
+Consent notices	Immediate	Standalone, clear, simple — explaining specific purpose for data collection
+Children's data	Immediate	Processing data of users below 18 requires verified parental consent
+Data localization	Immediate	Payment data, customer financial records, transaction histories must remain in India
+1.3 TRAI DLT Compliance (SMS/OTP)
+Mandatory: All businesses sending transactional SMS in India must complete DLT registration on an operator portal.
+
+Step	Detail
+Register business entity	On any operator DLT portal (Jio, Airtel, Vi, BSNL)
+Obtain PEID	19-digit Principal Entity ID
+Register Sender ID	6-character alphabetic code under correct category
+Create PE-TM chain	Add SMS provider as Telemarketer Aggregator
+Register templates	Pre-approve every SMS template, max 180 chars
+Whitelist URLs	Shortened URLs NOT permitted
+1.4 CERT-In Requirements
+Requirement	Detail
+Incident reporting	Within 6 hours of detection to CERT-In
+VAPT before go-live	Mandatory for all internet-facing applications
+Annual VAPT	Comprehensive VAPT by CERT-In empanelled auditors
+SOC	Continuous security monitoring recommended
+1.5 Consumer Protection (E-Commerce) Rules
+Requirement	Implementation
+Seller details	Published on platform
+Grievance officer	Name, contact, escalation path
+Return/refund/cancellation policy	Published, clear
+Delivery timelines	Displayed for physical products
+No dark patterns	No misleading urgency, false scarcity, forced actions
+1.6 Tax Compliance
+Tax	Applicability
+GST	On product sales, gift card procurement, co-pay transactions
+TDS Section 194R	On benefits/perquisites from business (rewards)
+TDS Section 194B	On winnings from lottery/games of chance (if applicable)
+GST on free goods	On rewards, free goods, vouchers
+Action: Engage a CA to map GST/TDS treatment for your exact flow before launch.
+
+2. Google Play Policy Compliance
+2.1 Incentivized Installs — The Critical Rule
+Google prohibits manipulation of ratings, reviews, or install counts through incentivized means, including incentivizing users to install other apps as the app's main functionality.[5†L14-L18] The policy explicitly states: "Developers must not attempt to manipulate the placement of any apps on Google Play. This includes, but is not limited to, inflating product ratings, reviews, or install counts by illegitimate means, such as fraudulent or incentivized reviews and ratings, or incentivizing users to install other apps as the app's main functionality."
+
+Compliance Strategy:
+
+Risk	Mitigation
+App perceived as "install for coins"	Home screen shows rewards marketplace first
+Offerwall dominant	Offerwall is ONE section under Earn tab
+Store listing misleading	Describe broader rewards features (surveys, brand deals, coupons, products)
+Campaign approval absent	Admin approval layer rejects non-compliant offers
+Safe Home Screen Priority:
+
+text
+1. Balance card (coins)
+2. Featured reward (brand deal/product)
+3. Earn highlights (survey, check-in, brand task)
+4. Brand deals carousel
+5. Offerwall (lower placement)
+2.2 Play Store-Only Install Rule (New — Mandatory)
+Requirement: All app/game install offers within the offerwall must redirect the user exclusively to the Google Play Store. No third-party APK sources, no direct APK downloads, no sideloading, no alternative app stores.
+
+Rationale: Installing apps from outside the Play Store exposes users to security risks and violates the trust model of the Android ecosystem. The offerwall provider must be configured to serve only Play Store-linked install offers.
+
+Aspect	Implementation
+Offer source	Offerwall provider (Tapjoy, ironSource, etc.) must be configured to serve only Play Store install offers
+User redirect	Clicking "Install" opens the Google Play Store listing (via market://details?id=<package_name> intent)
+Attribution	Attribution SDK (AppsFlyer/Adjust) must track installs originating from Play Store
+Backend validation	Backend must reject any postback where install source is not Play Store
+Offer approval	Admin must verify the offer's landing destination before approval
+User disclosure	Offer detail must state: "Installs must be completed via Google Play Store"
+Technical Implementation:
+
+text
+Offer Click Flow:
+User clicks "Start Offer"
+   ↓
+Backend creates click_id, logs offer source
+   ↓
+App opens Play Store via intent:
+   market://details?id=<package_name>
+   OR
+   https://play.google.com/store/apps/details?id=<package_name>
+   ↓
+User installs from Play Store
+   ↓
+Attribution SDK detects install, sends postback
+   ↓
+Backend validates:
+   - Install source = Play Store (via referrer data)
+   - Click ID matches
+   - No duplicate conversion
+   ↓
+Reward credited to PENDING
+Referrer Validation:
+
+Use the Google Play Install Referrer API to retrieve the install referrer string from the Play Store.
+
+The referrer string should contain the click_id or a unique identifier that maps back to the offer click.
+
+Backend must verify the referrer originates from Play Store before crediting rewards.
+
+Offerwall Provider Configuration:
+
+When setting up campaigns in Tapjoy/ironSource, select only "Install via Play Store" as the install source.
+
+Block any campaigns that use direct APK downloads or third-party app store links.
+
+Admin dashboard must display the install source for every offer and flag any non-Play-Store offers.
+
+2.3 AdMob Rewarded Ads — Direct Monetary Items Prohibited
+Policy: "Direct monetary items" — any form of legal currency or payment method usable in real world — are prohibited as rewards under any circumstance. Examples: cash, cryptocurrency, gift cards. Indirect/non-monetary items are permitted only if non-transferable and redeemable only within your platform.
+
+Aspect	AdMob Rewarded Ads	Offerwall/CPE Campaigns
+Reward type	In-app coins ONLY	Coins (redeemable for cash/gift cards)
+Cash-out possible?	❌ No	✅ Yes (via regulated provider)
+UI label	"Watch video to earn in-app coins"	"Complete offer to earn coins"
+Post-ad message	"50 coins credited to in-app balance"	"Coins pending verification"
+Revenue owner	Platform owner	Platform (after network fees)
+Critical UI Rule: The AdMob reward flow must be completely isolated from cash withdrawal and gift card redemption flows. Track two separate coin balances internally (or tag coins with source).
+
+2.4 Financial Features Declaration
+Mandatory: All developers must complete the Financial features declaration in Play Console. Declare "Purchase agreements — Rewards, points, frequent flier miles, and other incentives".
+
+2.5 Payments Policy
+Transaction Type	Payment Method
+Physical goods (electronics, accessories)	Razorpay (NOT Play Billing)
+Digital content/goods	Google Play Billing required
+Gift cards (redeemed with earned coins)	Does NOT require Play Billing
+In-app gift cards (electronic/physical)	Does NOT require Play Billing
+2.6 Account Deletion
+If accounts can be created, app must provide:
+
+In-app path to delete account
+
+External web link to request deletion
+
+URL entered in Play Console
+
+Associated user data deleted (with narrow exceptions)
+
+2.7 Target API Level
+Starting August 31, 2026, new apps and updates must target Android 16 (API level 36) or higher.
+
+2.8 Data Safety Section
+Must accurately disclose all data collection including:
+
+Phone number, device identifiers
+
+Offerwall SDK data
+
+Attribution SDK data
+
+Payout account details
+
+Analytics data
+
+3. Provider Integrations & Requirements
+3.1 Payment Gateway — Razorpay
+Item	Requirement
+KYC documents	Business PAN, GST certificate, bank account details, business address proof, authorised signatory PAN + identity proof
+Account activation	Test key immediately; Live key after KYC (24–48 hours)
+Webhook events	payment.authorized, payment.captured, payment.failed, order.paid, payment.dispute.created
+Integration	Only Owner/Admin can access API keys; separate Test and Live keys
+3.2 Payout Provider — RazorpayX
+Item	Requirement
+Idempotency key	Mandatory for all payout requests (X-Payout-Idempotency header)
+IP allowlisting	Mandatory — only allowlisted IPs can make payout API calls
+TLS version	1.2 or higher required per PCI regulations
+Account type	RazorpayX (not Lite for payouts to customer identifiers)
+Setup flow	Create Contact → Add Fund Account → Create Payout
+Name matching	Your responsibility between VPA holder and beneficiary
+3.3 Gift Card Provider — Xoxoday Plum
+Item	Detail
+Coverage	1M+ reward options across e-commerce, gold, electronics, travel, food
+API type	REST API for programmatic gift card procurement and fulfillment
+Integration	Directly integrated with manufacturer's reward distribution system
+Delivery	Real-time fulfillment at moment of redemption
+Onboarding	Register company → Get API credentials → Fund account → Go live
+Brand KYC	Some brands (Amazon India, Mastercard) require additional KYC
+Alternative: QwikCilver (Pine Labs), GyFTR (Vouchagram).
+
+3.4 Offerwall Providers (Play Store-Only Configuration)
+Provider	Integration	Key Features	Play Store-Only Config
+Tapjoy (Unity)	Self-managed currency with reward callbacks, server-side transaction handling	CPE milestones, multi-event rewards	Configure campaigns to serve only Play Store install offers
+ironSource (Unity)	SDK integration, rewarded video + Offerwall ad units	Server-to-server callbacks recommended for verification	Filter offers by install source = Play Store
+AdGem	API for untargeted offers with country filtering	Surveys, offers, tasks	API filter for Play Store install offers
+Integration Requirement: S2S postback setup. Backend must validate signature, check duplicates, map to user ID, credit coins. Firewall: Allow incoming requests from Tapjoy/ironSource IP addresses to your postback endpoint.
+
+3.5 Attribution SDK — AppsFlyer / Adjust
+Provider	India-Specific Requirement
+AppsFlyer	India data center option available (contractual). Postback macros include click_id, country_code=(ip)
+Adjust	Additional line of code required for India campaigns — set URL strategy via AdjustConfig object. Note: adjust.com links are blocked nationwide in India
+Play Store-Only Validation: Both SDKs must be configured to track installs originating only from Play Store. Backend must validate the install referrer.
+
+3.6 SMS/OTP Provider — Zoho CPaaS
+Item	Requirement
+DLT registration	PEID (19-digit), Sender ID (6-char), Template approval
+Pricing	₹0.18 per SMS (up to 160 chars)
+Account	Must be hosted in India DC
+Templates	Variables like {#var#} for OTP; max 180 chars
+Alternatives: Kaleyra, Exotel, Gupshup, MSG91.
+
+3.7 Push Notification — Firebase Cloud Messaging (FCM)
+Item	Detail
+Cost	Free on both Spark and Blaze plans
+Android 13+	Must request POST_NOTIFICATIONS permission at runtime
+Manifest	<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+Xiaomi/Oppo/Vivo India models	All use FCM — no OEM-specific SDK needed
+3.8 KYC Provider — Cashfree Secure ID / Signzy
+Provider	Key Features
+Cashfree Secure ID	RBI-compliant Video KYC, Aadhaar/PAN verification, AI-powered multilingual VKYC (20+ regional languages)
+Signzy	India KYC, KYB, AML workflows, Aadhaar eKYC, Video KYC, 2–4 week go-live
+Alternative: Karza, Sandbox.co.in.
+
+3.9 Infrastructure
+Component	Recommended	Notes
+Backend	Node.js + TypeScript	Fast API development
+Database	PostgreSQL	UUIDs/ULIDs, UTC timestamps, ACID transactions
+Cache	Redis	Session, rate limiting, offer catalog
+Admin	Next.js/React	Web control plane
+Storage	S3-compatible (India region)	KYC docs, product images
+Monitoring	Sentry	Error tracking, performance
+Secrets	AWS Secrets Manager	Never in APK or source control
+Cloud	AWS/GCP India region	DPDP data localization
+4. App UI Architecture
+4.1 Navigation Structure
+text
+Bottom Navigation (5 tabs):
+┌─────────┬─────────┬──────────┬─────────┬─────────┐
+│  Home   │  Earn   │ Rewards  │ Wallet  │ Profile │
+└─────────┴─────────┴──────────┴─────────┴─────────┘
+4.2 Screen Map
+Screen	Section	Key Elements
+Splash	—	Logo, loading
+Onboarding	—	3–4 slides, age gate, DPDP consent
+Phone Auth	—	+91 input, OTP verification
+Consent	—	Granular DPDP consent, push permission
+Home	Tab 1	Balance card, featured reward, earn highlights, brand deals, recent activity
+Earn	Tab 2	Daily check-in, surveys, brand tasks, offerwall, refer & earn, AdMob rewarded (separate)
+Rewards	Tab 3	Gift cards, products, coupons, brand deals
+Wallet	Tab 4	Balances (available/pending/locked), ledger, withdrawals, orders
+Profile	Tab 5	Account, KYC, payout methods, referral, reward rules, support, legal, settings, account deletion
+Offer Detail	From Earn	Provider, reward, status, steps, terms, report issue, install source badge (Play Store)
+Product Detail	From Rewards	Images, MRP, partner price, coin + cash, stock, delivery
+Gift Card Detail	From Rewards	Brand, denominations, coin cost, redeem
+Checkout	From Product	Coin reservation, Razorpay checkout, order confirmation
+Withdrawal	From Wallet	UPI/bank selection, account verification, amount, KYC check
+Notifications	Global	Reward credits, payout status, order updates
+Support	From Profile	FAQ, ticket creation, ticket history, grievance officer
+4.3 AdMob Rewarded Ads — UI Compliance
+text
+Section Title: "Watch video to earn in-app coins"
+Subtitle: "Coins can be used for in-app rewards only"
+Reward: "+50 coins"
+CTA: "Watch Ad"
+Post-Ad: "50 coins credited to your in-app balance"
+
+❌ NEVER: "Watch ad and earn ₹10"
+❌ NEVER: "Coins can be redeemed for cash/gift cards"
+❌ NEVER: "+₹0.50" or "50 points (₹1 value)"
+4.4 Offerwall UI — Play Store-Only Badge
+text
+Section Title: "Complete offers to earn coins"
+Reward: "700 coins"
+Status badges: Pending | Approved | Reversed
+Steps: 1. Install from Play Store, 2. Open, 3. Reach Level 10
+Install Source: "Google Play Store" (with verified badge)
+Report Issue: Button with offer ID + click ID
+Offer Detail Screen Must Show:
+
+Provider logo
+
+Task description
+
+Reward coins
+
+Estimated completion time
+
+Install Source: Google Play Store (with verified badge)
+
+Terms link
+
+"Start Offer" button (opens Play Store via intent)
+
+"Report missing reward" button
+
+4.5 India-Specific Design
+Consideration	Implementation
+Low-end devices	Lightweight UI, minimal animations, offline caching
+Data usage	Compressed images, lazy load, no auto-play video
+Languages	English + Hindi + regional (Tamil, Telugu, Bengali)
+UPI first	Cashout defaults to UPI, then bank
+Trust signals	Verified badges, transparent rules, clear terms
+Accessibility	Large touch targets, high contrast, screen reader support
+5. Server Workflow & Backend Architecture
+5.1 High-Level Architecture
+text
+┌─────────────────────────────────────────────────────────────┐
+│                     ANDROID APP                              │
+│  (Kotlin + Jetpack Compose)                                  │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ HTTPS
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   API GATEWAY / BACKEND                      │
+│  (Node.js + TypeScript)                                      │
+│  ┌──────────┬──────────┬──────────┬──────────┬──────────┐   │
+│  │  Auth    │  Offers  │  Wallet  │  Orders  │  Admin   │   │
+│  └──────────┴──────────┴──────────┴──────────┴──────────┘   │
+└──────┬──────────┬──────────┬──────────┬──────────┬──────────┘
+       │          │          │          │          │
+       ▼          ▼          ▼          ▼          ▼
+┌──────────┐┌──────────┐┌──────────┐┌──────────┐┌──────────┐
+│PostgreSQL││  Redis   ││  S3      ││  Sentry  ││  FCM     │
+└──────────┘└──────────┘└──────────┘└──────────┘└──────────┘
+       │
+       ▼
+┌─────────────────────────────────────────────────────────────┐
+│                 PROVIDER ADAPTERS                            │
+│  ┌──────────┬──────────┬──────────┬──────────┬──────────┐   │
+│  │Razorpay  │RazorpayX │Xoxoday   │Tapjoy/   │AppsFlyer │   │
+│  │(Payments)│(Payouts) │(Gift)    │ironSource│(Attrib)  │   │
+│  └──────────┴──────────┴──────────┴──────────┴──────────┘   │
+│  ┌──────────┬──────────┬──────────┬──────────┐              │
+│  │Cashfree  │Zoho SMS  │AdMob     │KYC       │              │
+│  │(KYC)     │(OTP)     │(Ads)     │Provider  │              │
+│  └──────────┴──────────┴──────────┴──────────┘              │
+└─────────────────────────────────────────────────────────────┘
+5.2 Offer Lifecycle (Server-Side) — Play Store-Only
+text
+Advertiser creates campaign (Play Store install only)
+        ↓
+Admin reviews & approves
+        ↓
+Tracking + attribution configured (Play Store install source)
+        ↓
+Offer becomes eligible (status: LIVE)
+        ↓
+User sees offer in app (with "Google Play Store" badge)
+        ↓
+User clicks CTA → click_id created
+        ↓
+App opens Play Store via intent:
+   market://details?id=<package_name>
+        ↓
+User completes required event (install, registration, level)
+        ↓
+Provider verifies event (S2S postback)
+        ↓
+Backend receives postback:
+  1. Validate signature
+  2. Check idempotency (conversion_id)
+  3. Map to user_id
+  4. Check duplicate
+  5. **Validate install source = Play Store**
+  6. Create ledger entry (PENDING)
+        ↓
+Approval window passes / provider confirms
+        ↓
+Reward becomes AVAILABLE
+        ↓
+Notification sent to user
+        ↓
+User redeems (cash/gift card/product)
+Referrer Validation Logic:
+
+typescript
+// Pseudocode for Play Store referrer validation
+async function validateInstallSource(postback: Postback) {
+  const referrer = await getPlayInstallReferrer(postback.device_id);
+  
+  // Referrer must originate from Play Store
+  if (!referrer || !referrer.includes('play.google.com')) {
+    throw new Error('Install source is not Play Store');
+  }
+  
+  // Referrer must contain matching click_id
+  if (!referrer.includes(postback.click_id)) {
+    throw new Error('Click ID mismatch in referrer');
+  }
+  
+  return true;
+}
+5.3 Wallet Ledger Rules
+text
+- Append-only: never UPDATE or DELETE ledger entries
+- Balance = SUM of all valid entries
+- Cached balance for performance only
+- Every entry has: transaction_id, idempotency_key, reference_type, reference_id
+- Reversals create NEW negative entry (never edit history)
+- Redemption reserves coins → releases on failure
+- Admin adjustments require dual authorization + audit log
+5.4 Webhook Security
+Requirement	Implementation
+Signature verification	Validate HMAC signature on every webhook
+Replay protection	Store event_id, reject duplicates
+Idempotency	Process each event exactly once
+Retry	Exponential backoff with dead-letter queue
+Raw payload hash	Store for audit and debugging
+IP allowlist	Restrict webhook sources where provider supports
+5.5 Reconciliation Jobs
+text
+Daily:
+1. Fetch Razorpay settlements → Compare vs internal payments
+2. Fetch RazorpayX payouts → Compare vs internal withdrawals
+3. Fetch Xoxoday orders → Compare vs internal gift card orders
+4. Fetch offerwall postbacks → Compare vs internal conversions
+5. **Verify all install offers originated from Play Store**
+6. Flag mismatches → Finance review → Close accounting day
+
+Weekly:
+- AdMob revenue report vs recorded revenue
+- Fraud loss rate vs reserve
+- Reward liability vs outstanding coins
+6. Admin Panel
+6.1 Section Map
+Section	Key Functions
+Dashboard	DAU/MAU, tasks completed, payout value, reward cost, revenue, fraud rate, pending queues
+Users	Search, status, device/risk summary, wallet, offer history, withdrawals, support tickets
+Offers	Create/import, reward, provider, terms, status, limits, targeting, approval, install source validation (Play Store only)
+Wallet	Ledger viewer, adjustments with dual authorization, reversals, reconciliation
+Withdrawals	Queue, risk flags, approve/reject, retry, provider status, export
+Gift Cards	Catalog sync, availability, order history, delivery status, reconciliation
+Products	Catalog, pricing, coin component, cash component, stock, supplier, shipping rules
+Brands	CRM profile, contract status, campaigns, budgets, creative assets, reporting
+Fraud	Rules, blocklists, device/account clusters, velocity, manual review
+Campaigns	Advertiser campaigns, budgets, performance, settlement, install source filter
+Finance	Payouts, reconciliation, reports, invoices, GST/TDS
+Support	Tickets, user communications, escalations
+Audit Logs	Immutable log of all admin actions
+Settings	Roles, permissions, provider configs, reward rules
+6.2 Admin Roles (RBAC)
+Role	Permissions
+Super Admin	All (secrets outside UI)
+Operations	Offers, users, support, withdrawals (per approval limits)
+Finance	Payouts, reconciliation, reports; no offer content edits
+Marketing	Campaigns, banners, brands; no wallet adjustments
+Support	Tickets and user communications
+Risk/Fraud	Flags, holds, review decisions
+Read-only Analyst	Analytics only
+6.3 Admin Actions Requiring Audit Log
+text
+- Reward adjustment
+- Campaign approval/pause
+- Balance correction
+- Withdrawal approval/rejection
+- Product price change
+- Coin-price change
+- Refund processing
+- Manual voucher issue
+- User ban/unban
+- **Offer approval (with install source check)**
+6.4 Offer Approval Workflow (Play Store-Only)
+text
+Offer submitted by advertiser/provider
+        ↓
+Admin reviews:
+  1. Offer description and terms
+  2. Reward amount vs campaign economics
+  3. **Install source: Must be Google Play Store**
+  4. Landing URL: Must be Play Store listing
+  5. Attribution partner configured
+        ↓
+If install source ≠ Play Store → REJECT
+        ↓
+If approved → Offer goes LIVE
+        ↓
+Postback validation checks install source on every conversion
+7. User Flows
+7.1 Onboarding & Authentication
+text
+Splash → Onboarding Carousel → Phone Number (+91)
+  → OTP Verification → Age Gate (18+ or parental consent)
+  → DPDP Consent (granular) → Push Permission
+  → Profile Setup (name, email optional, referral code optional)
+  → Home
+7.2 Earning Flow (Play Store-Only Installs)
+text
+User opens Earn tab
+  → Sees sections: Daily Check-in | Surveys | Brand Tasks | Offerwall | Refer
+  → Selects offer
+  → Offer detail: provider, reward, steps, terms
+  → Install source shown: "Google Play Store" (verified badge)
+  → Clicks "Start Offer" → click_id created
+  → App opens Play Store via intent
+  → User installs from Play Store
+  → Completes required event (registration, level, etc.)
+  → Provider verifies via S2S postback
+  → Backend validates:
+      - Signature valid
+      - No duplicate
+      - Install source = Play Store
+  → Ledger entry: PENDING
+  → Approval window passes → Ledger entry: AVAILABLE
+  → Notification: "Reward credited"
+7.3 AdMob Rewarded Ad Flow (Separate)
+text
+User opens AdMob section
+  → Sees: "Watch video to earn in-app coins"
+  → Clicks "Watch Ad"
+  → Google ad plays
+  → User watches to completion
+  → AdMob SDK credits in-app coins
+  → Coins go to in-app balance (non-transferable, non-cash)
+  → User can spend ONLY on in-app features/discounts (≤25% of product value)
+7.4 Cash Withdrawal Flow
+text
+Wallet → Redeem → Cash
+  → Select UPI/Bank
+  → Enter/verify account (penny drop)
+  → Enter amount (min/max limits)
+  → KYC check (if required)
+  → Risk checks (velocity, account age, abnormal patterns)
+  → Reserve coins
+  → Create withdrawal record
+  → Auto-approve (low risk) OR manual review
+  → Call RazorpayX payout API (idempotency key + IP allowlist)
+  → Webhook updates status
+  → Success: finalize coin deduction
+  → Failure: release reserved coins
+7.5 Gift Card Redemption Flow
+text
+Wallet → Redeem → Gift Card
+  → Browse catalog (Xoxoday Plum)
+  → Select brand + denomination
+  → Calculate coin cost
+  → Reserve coins
+  → Place Xoxoday order (idempotency key)
+  → Provider returns code/link + order ID
+  → Secure delivery screen
+  → Mark redeemed
+  → Reconcile provider webhook
+7.6 Product + Cash Co-Pay Flow
+text
+Rewards → Products → Select product
+  → Display: coin requirement + INR co-pay + delivery info
+  → Reserve coins
+  → Create checkout order
+  → User pays INR via Razorpay
+  → Razorpay webhook: payment.captured
+  → Place fulfillment order
+  → Finalize coin deduction
+  → Send tracking
+  → Handle cancellation/return/refund
+8. Data Model (PostgreSQL)
+8.1 Core Tables
+sql
+-- Users & Auth
+users (id, phone_hash, country, status, created_at, last_seen_at)
+user_profiles (user_id, display_name, referral_code, payout_preferences)
+devices (id, user_id, install_metadata, risk_state)
+user_consents (id, user_id, consent_type, granted_at, revoked_at)
+kyc_records (id, user_id, provider, status, verified_at, document_hash)
+
+-- Wallet & Ledger
+wallet_accounts (id, user_id, cached_balance, created_at)
+wallet_ledger (id, user_id, type, coins, reference_type, reference_id,
+               idempotency_key, status, created_at)
+reward_rules (id, source_type, coins_per_unit, effective_from, effective_to)
+
+-- Offers & Campaigns
+offers (id, provider, provider_offer_id, reward_coins, status, terms,
+        targeting, budget_total, budget_remaining, 
+        install_source VARCHAR(20) DEFAULT 'play_store',  -- NEW: enforce Play Store only
+        landing_url VARCHAR(500))                         -- NEW: must be Play Store URL
+offer_clicks (id, user_id, offer_id, click_id, started_at, source_metadata)
+conversions (id, click_id, provider_conversion_id, event_type, status,
+             received_at, payout_amount, reward_coins,
+             install_source_validated BOOLEAN)            -- NEW: Play Store validation flag
+conversion_events (id, provider, campaign_id, click_id, conversion_id,
+                   user_id, event_name, payout_amount, reward_coins, status,
+                   signature_valid, received_at, raw_payload_hash,
+                   referrer_string VARCHAR(500))           -- NEW: Play Store referrer
+
+-- Redemption
+withdrawals (id, user_id, method, amount_coins, rupee_value, status,
+             provider_id, provider_payout_id, idempotency_key, created_at)
+gift_catalog (id, provider_product_id, brand, denomination, country,
+              active, synced_at)
+gift_orders (id, user_id, catalog_id, coins, provider_order_id,
+             delivery_status, created_at)
+products (id, supplier_id, title, price_inr, coin_price, copay_inr,
+          stock_status, shipping_regions)
+orders (id, user_id, product_id, coin_amount, cash_amount, payment_id,
+        fulfillment_id, status, created_at)
+payments (id, order_id, provider, provider_payment_id, amount, status,
+          webhook_data_hash, created_at)
+refunds (id, order_id, amount, reason, status, processed_at)
+
+-- Brands & Advertisers
+brands (id, legal_name, display_name, gst_details, contact_person,
+        contract_status, commission_rate, settlement_terms)
+advertisers (id, company_name, contact_person, billing_email, gst_details)
+campaigns (id, advertiser_id, campaign_type, budget_total,
+           budget_remaining, start_at, end_at, status)
+advertiser_invoices (id, advertiser_id, campaign_id, amount, gst,
+                     status, due_date)
+
+-- Fraud & Support
+fraud_events (id, user_id, type, score, evidence, action, created_at)
+support_tickets (id, user_id, category, status, evidence, resolution,
+                 created_at)
+notifications (id, user_id, type, title, body, read_at, created_at)
+
+-- Admin & Audit
+admin_audit_log (id, admin_id, action, target_type, target_id,
+                 before_hash, after_hash, created_at)
+webhook_events (id, provider, event_id, signature_valid, processed,
+                payload_hash, received_at)
+reconciliation_records (id, provider, date, expected_total, actual_total,
+                        mismatch_amount, status, resolved_at)
+8.2 Critical Constraints
+sql
+-- Wallet ledger: append-only (enforce via trigger)
+-- Idempotency: unique per source
+CREATE UNIQUE INDEX idx_ledger_idempotency
+  ON wallet_ledger (idempotency_key);
+
+-- Conversion: unique provider event
+CREATE UNIQUE INDEX idx_conversion_event
+  ON conversion_events (provider, conversion_id);
+
+-- Withdrawal: unique idempotency
+CREATE UNIQUE INDEX idx_withdrawal_idempotency
+  ON withdrawals (idempotency_key);
+
+-- Play Store only install source
+ALTER TABLE offers ADD CONSTRAINT chk_install_source
+  CHECK (install_source = 'play_store');
+
+-- Landing URL must be Play Store
+ALTER TABLE offers ADD CONSTRAINT chk_landing_url
+  CHECK (landing_url LIKE 'https://play.google.com/store/apps/%'
+         OR landing_url LIKE 'market://details?id=%');
+9. API Specification
+9.1 User APIs
+text
+POST   /v1/auth/send-otp          Send OTP
+POST   /v1/auth/verify-otp        Verify login
+GET    /v1/me                     User profile
+GET    /v1/home                   Home feed
+GET    /v1/offers                 Eligible offers (Play Store only)
+POST   /v1/offers/{id}/start      Create tracked session
+GET    /v1/wallet                 Balances + summary
+GET    /v1/wallet/ledger          Ledger history
+POST   /v1/withdrawals            Request UPI/bank withdrawal
+GET    /v1/withdrawals            Withdrawal history
+GET    /v1/rewards/gift-cards     Gift-card catalog
+POST   /v1/rewards/gift-cards/redeem  Redeem gift card
+GET    /v1/rewards/products       Product catalog
+POST   /v1/orders                 Create physical product order
+POST   /v1/orders/{id}/payment    Create payment checkout
+POST   /v1/webhooks/{provider}    Receive provider webhook
+POST   /v1/account/delete         Start account deletion
+GET    /v1/support/tickets        Support list
+POST   /v1/support/tickets        Create ticket
+GET    /v1/notifications          Notification list
+9.2 Advertiser APIs
+text
+POST   /v1/advertisers/campaigns       Create campaign
+GET    /v1/advertisers/campaigns       List campaigns
+PATCH  /v1/advertisers/campaigns/{id}  Update campaign
+GET    /v1/advertisers/campaigns/{id}/stats  Campaign analytics
+POST   /v1/tracking/postback/{provider}      Receive postback
+9.3 Brand APIs
+text
+POST   /v1/brands/apply             Brand application
+POST   /v1/brands/products          Add product
+PATCH  /v1/brands/products/{id}     Update product
+POST   /v1/brands/deals             Create deal
+GET    /v1/brands/orders            View orders
+GET    /v1/brands/settlements       Settlement history
+9.4 Admin APIs
+text
+GET    /v1/admin/users              User list
+GET    /v1/admin/wallet/ledger      Ledger viewer
+POST   /v1/admin/wallet/adjust      Manual adjustment (dual auth)
+GET    /v1/admin/withdrawals        Withdrawal queue
+POST   /v1/admin/withdrawals/{id}/approve  Approve
+POST   /v1/admin/withdrawals/{id}/reject   Reject
+GET    /v1/admin/fraud/flags        Fraud flags
+POST   /v1/admin/offers/{id}/approve  Approve offer (validates Play Store source)
+POST   /v1/admin/offers/{id}/pause    Pause offer
+GET    /v1/admin/audit-logs         Audit log viewer
+9.5 Security Requirements
+Requirement	Implementation
+HTTPS only	TLS 1.2+
+Authentication	JWT/session tokens, short-lived
+Rate limiting	OTP, login, offer-start, withdrawal
+Idempotency	All write endpoints affecting coins/orders
+Input validation	Every endpoint
+Admin MFA	Mandatory for admin accounts
+Secrets	Managed secret store, never in APK
+10. Financial Model & Unit Economics
+10.1 Revenue Streams
+Stream	Who Pays	Platform Earns When
+Offer/CPE campaigns	Advertiser	Verified event occurs
+CPA campaigns	Advertiser	Qualified action occurs
+Sponsored placement	Brand/advertiser	Campaign placement sold
+Featured brand listing	Brand	Listing campaign active
+Product margin	Brand/merchant	Product redeemed/sold
+Co-pay transaction margin	Brand/merchant	User completes coins + cash checkout
+AdMob rewarded ads	Google (advertiser share)	Ad shown (revenue to platform only)
+10.2 Per-Campaign Profitability Check
+text
+Advertiser payout                ₹10.00
+Offer network/provider fee        ₹1.00
+Payment/technology cost           ₹0.50
+Fraud reserve                     ₹0.50
+User reward value                 ₹6.00
+--------------------------------------
+Estimated contribution            ₹2.00
+
+Rule: Never launch if contribution < 0
+10.3 Coin Economy
+Parameter	Value
+Coin name	Rewards Coin (RC)
+Sample rate (UX prototype)	100 RC = ₹1
+Production rate	Configurable, driven by campaign economics
+Coin states	Pending → Available → Redeemed / Reversed
+Expiry	Configurable (e.g., 12 months from credit)
+Critical: Do NOT make 1 coin = ₹1 automatically. Coins are internal rewards units; value governed by published rules and campaign economics.
+
+10.4 Reward Liability Accounting
+text
+Outstanding coins × configured_coin_rate = Reward Liability
+This is a liability on your books, not revenue
+10.5 Breakage Policy
+Scenario	Treatment
+Dormant account (>12 months)	Coins expire per published policy
+Breakage revenue	Recognized when coins expire
+Legal requirement	Disclose expiry in Reward Rules
+11. Fraud & Abuse Controls
+11.1 Risk Signals
+Signal	Action
+Too many account creations / device cluster	Hold rewards, review
+Rapid repeated offer starts	Throttle
+Unusual conversion pattern	Pending/manual review
+Payout velocity spike	Temporary withdrawal hold
+Provider chargeback/reversal	Reverse associated reward
+Referral abuse cluster	Block referral rewards
+Payment mismatch	Do not fulfill order
+Install source ≠ Play Store	Reject reward, flag user
+11.2 Reward States
+text
+CLICKED → PENDING → VERIFIED → AVAILABLE → REDEEMED
+Suspicious: PENDING_REVIEW | REJECTED | REVERSED | CHARGEBACK
+11.3 Privacy Principle
+Do not collect invasive device/application data merely because it could help fraud detection. Collect only what is necessary, disclose it accurately, and design the fraud system around server-side provider signals wherever possible.
+
+12. Launch Checklist
+12.1 Legal & Compliance
+text
+[ ] Business entity registered (Pvt Ltd / LLP)
+[ ] Business PAN obtained
+[ ] GST registration completed
+[ ] Legal opinion on coin/cashout model obtained
+[ ] DPDP consent framework implemented
+[ ] Grievance officer appointed and published
+[ ] Reward Rules, Withdrawal Rules, Referral Rules published
+[ ] Privacy Policy published (active, non-geofenced URL)
+[ ] Terms of Service published
+[ ] Returns/Cancellation policy published
+[ ] CERT-In empanelled VAPT auditor engaged
+12.2 Provider Accounts
+text
+[ ] Razorpay account created + KYC submitted
+[ ] RazorpayX account created + KYC submitted
+[ ] Xoxoday Plum account registered + funded
+[ ] Offerwall provider account created (Tapjoy / ironSource)
+[ ] Offerwall configured for Play Store-only installs
+[ ] AppsFlyer / Adjust account created
+[ ] DLT registration completed (PEID, Sender ID, templates)
+[ ] Zoho CPaaS / Kaleyra account created
+[ ] Firebase project created (FCM enabled)
+[ ] Cashfree Secure ID / Signzy account created
+[ ] AWS/GCP account created (India region)
+12.3 Google Play Console
+text
+[ ] Developer account created ($25)
+[ ] Financial features declaration completed
+[ ] Data Safety form completed accurately
+[ ] Privacy policy link added
+[ ] Account deletion in-app path implemented
+[ ] Account deletion web link implemented
+[ ] Account deletion URL entered in Console
+[ ] Target API 36 (Android 16)
+[ ] Content rating completed
+[ ] Store listing describes broader rewards features
+[ ] Play Store-only install policy documented in app
+12.4 Technical
+text
+[ ] Wallet ledger append-only with idempotency
+[ ] Webhook signature verification
+[ ] Webhook replay protection
+[ ] RazorpayX IP allowlisting configured
+[ ] RazorpayX idempotency key implemented
+[ ] Play Store referrer validation implemented
+[ ] Offer approval workflow validates install source
+[ ] Reconciliation jobs operational
+[ ] Admin RBAC with MFA
+[ ] Admin audit logs immutable
+[ ] Fraud rules configured
+[ ] Backup and restore tested
+13. References
+#	Source	URL
+1	Google Play — User Ratings, Reviews, and Installs	https://support.google.com/googleplay/android-developer/answer/9898684
+2	Google Play — Developer Program Policy	https://support.google.com/googleplay/android-developer/answer/17190352
+3	Google AdMob — Policies for ad units that offer rewards	https://support.google.com/admob/answer/7313578
+4	Google Play — Financial features declaration	https://support.google.com/googleplay/android-developer/answer/13849271
+5	Google Play — Payments policy	https://support.google.com/googleplay/android-developer/answer/10281818
+6	RBI — Draft PPI Directions	https://www.rbi.org.in
+7	MeitY — DPDP Rules 2025	https://www.meity.gov.in
+8	TRAI — DLT Registration	https://www.trai.gov.in
+9	Razorpay — KYC Documents	https://razorpay.com/docs
+10	RazorpayX — Payouts Best Practices	https://razorpay.com/docs/payouts
+11	Xoxoday Plum — Rewards API	https://developers.xoxoday.com
+12	Unity/Tapjoy — Offerwall	https://docs.unity.com
+13	ironSource — SDK Integration	https://developers.is.com
+14	AppsFlyer — Postback Macros	https://support.appsflyer.com
+15	Adjust — India Campaigns	https://help.adjust.com
+16	Cashfree — Secure ID	https://www.cashfree.com
+17	Signzy — KYC API	https://docs.signzy.com
+18	Zoho CPaaS — DLT	https://www.zoho.com
+19	Firebase — FCM Android	https://firebase.google.com
+20	Google Play Install Referrer API	https://developer.android.com/google/play/installreferrer

@@ -1,0 +1,20 @@
+{
+  "name": "rewards-platform",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build:api && npm run build:validation",
+    "dev:api": "npm --workspace @rewards-platform/api run dev",
+    "build:api": "npm --workspace @rewards-platform/api run build",
+    "build:validation": "npm --workspace @rewards-platform/validation run build",
+    "test": "npm --workspace @rewards-platform/api run test && npm --workspace @rewards-platform/validation run test",
+    "lint:api": "npm --workspace @rewards-platform/api run lint",
+    "infra:up": "docker compose up --build -d",
+    "infra:down": "docker compose down",
+    "infra:logs": "docker compose logs -f api postgres redis"
+  }
+}

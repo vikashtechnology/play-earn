@@ -1,0 +1,10 @@
+{
+  "name": "@rewards-platform/admin",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "echo \"Admin scaffold ready for implementation\"",
+    "build": "echo \"Admin build not configured yet\"",
+    "test": "echo \"Admin tests not configured yet\""
+  }
+}

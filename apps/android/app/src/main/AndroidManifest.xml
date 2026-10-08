@@ -1,0 +1,45 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="false"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Firebase email sign-in links land here. The scheme/host/path come
+                 from the EMAIL_LINK_URL Gradle property and must match the
+                 ActionCodeSettings URL and an authorized domain in the Firebase
+                 console. Set autoVerify to true once your domain hosts a valid
+                 assetlinks.json for App Links. -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="${emailLinkScheme}"
+                    android:host="${emailLinkHost}"
+                    android:path="${emailLinkPath}" />
+            </intent-filter>
+
+            <!-- Reserved in-app deep link for future verification and support flows. -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="playearnrealcash"
+                    android:host="auth"
+                    android:path="/verify-email" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
