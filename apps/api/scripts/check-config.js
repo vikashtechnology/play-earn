@@ -264,8 +264,9 @@ function checkGoogleServices() {
   const packageName = client?.client_info?.android_client_info?.package_name;
   if (packageName !== ANDROID_PACKAGE) {
     block(
-      `google-services.json package_name is "${packageName}"`,
-      `The app's applicationId is ${ANDROID_PACKAGE}. Register that package in Firebase and re-download.`,
+      `google-services.json registers "${packageName}", but the app's applicationId is ${ANDROID_PACKAGE}`,
+      `Firebase console → Project settings → Your apps → Add app → Android → ${ANDROID_PACKAGE}, `
+      + 'then replace apps/android/app/google-services.json. See docs/10_Firebase_Console_Checklist.md step 0.',
     );
   } else {
     ok(`Android package matches ${ANDROID_PACKAGE}`);

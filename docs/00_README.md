@@ -16,6 +16,7 @@
 | `07_Fraud_Rules_v1.md` | Starting fraud signals, risk score, device & payout controls |
 | `08_Support_SLA.md` | Support priorities, SLAs, escalation, templates |
 | `09_Firebase_Neon_Setup.md` | Firebase Auth + Neon configuration, auth endpoints, pre-launch checks |
+| `10_Firebase_Console_Checklist.md` | Step-by-step console runbook for project `play-f9fe2`: package registration, SHA fingerprints, providers, authorized domains, App Check, cleanup |
 | `prd.md` | Product requirements (short) |
 | `architecture.md` | Stack, structure, wallet, provider adapters |
 | `memory.md` | Project decisions and status |

@@ -7,6 +7,9 @@ live sign-in: the API fails closed until these values are real.
 
 ## 1. Firebase project
 
+> The console work for the live project (`play-f9fe2`) is a step-by-step runbook
+> in **`10_Firebase_Console_Checklist.md`**. This section is the general shape.
+
 1. Create a project at https://console.firebase.google.com.
 2. **Add an Android app** with package name `com.rewardsplatform.app`.
    - Register the debug SHA-1 (and SHA-256) from `./gradlew signingReport`, plus

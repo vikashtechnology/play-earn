@@ -10,6 +10,11 @@ coverage/
 *.log
 
 # Android
+# Signing material must never be committed. Keep an offline backup: losing the
+# release keystore means losing the ability to update the app.
+*.jks
+*.keystore
+**/keystore.properties
 **/.gradle/
 **/build/
 **/local.properties
