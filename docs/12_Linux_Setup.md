@@ -3,10 +3,28 @@
 Complete instructions for a Linux machine (written on Ubuntu 24.04 / Debian 12;
 other distros need only the package-manager commands swapped).
 
-**Heads-up before you start:** the repository has **no Gradle wrapper** — no
-`gradlew`, no `gradle/wrapper/`. Install Gradle once (§4) and either use
-`gradle …` directly, or generate the wrapper and commit it so everyone else gets
-a pinned version.
+## Do it in one command
+
+After cloning (§2), `scripts/linux-setup.sh` runs every stage below for you —
+system packages, Node 22, JDK 17, the headless Android SDK, Gradle, the wrapper
+this repository is missing, `npm install`, `apps/api/.env`, verification, and
+optionally the debug APK. It is idempotent: each stage checks whether the work
+is already done and skips it, so re-running after a failure is safe.
+
+```sh
+bash scripts/linux-setup.sh --dry-run   # see exactly what it would do
+bash scripts/linux-setup.sh             # then run it for real
+bash scripts/linux-setup.sh --skip-apk  # everything but the APK build
+bash scripts/linux-setup.sh --only=android,gradle
+```
+
+It asks before anything that needs `sudo`, never prints a secret, and appends to
+`~/.bashrc` only when a line is not already there. The rest of this document
+explains what each stage does, so you can run any of them by hand.
+
+**Heads-up:** the repository has **no Gradle wrapper** — no `gradlew`, no
+`gradle/wrapper/`. The script generates one in stage 4; until then use `gradle …`
+rather than `./gradlew`.
 
 ---
 

@@ -57,6 +57,9 @@ play-earn/
 
 ## Quick start
 
+On Linux, `bash scripts/linux-setup.sh` performs every step below plus the
+Android toolchain; see `docs/12_Linux_Setup.md`. By hand:
+
 ```sh
 npm install
 
