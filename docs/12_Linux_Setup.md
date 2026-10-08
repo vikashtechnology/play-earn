@@ -232,6 +232,10 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb logcat -s Zivora:V AndroidRuntime:E      # or: gradle :app:installDebug
 ```
 
+For a physical phone — USB or wireless `adb`, the udev rule, proving the LAN
+path from the phone's browser, and what the fail-closed gates currently allow —
+see **§6**.
+
 If the phone cannot reach the API, check the Linux firewall:
 
 ```sh
@@ -250,7 +254,140 @@ gradle signingReport           # copy SHA-1 and SHA-256 for the debug variant
 
 ---
 
-## 6. Emulator on Linux (optional)
+## 6. Test on a physical phone (preferred over an emulator)
+
+A real device is the better test target: Play Integrity attestation for phone
+auth **cannot pass on an emulator**, and a phone exercises the real network path
+rather than the emulator's virtual one.
+
+### 6.1 Prepare the phone
+
+1. **Settings → About phone → Build number** — tap it seven times to unlock
+   Developer options.
+2. **Settings → System → Developer options → USB debugging** — enable.
+3. Plug in the cable; the phone asks *"Allow USB debugging?"* — tick **Always
+   allow from this computer** and accept.
+
+```sh
+adb devices          # must list the serial as "device", not "unauthorized"/"offline"
+```
+
+If it says `no permissions` or the device is missing, add a udev rule. Read your
+phone's vendor id from `lsusb` rather than trusting a list — well-known ones are
+Google `18d1`, Samsung `04e8`, Xiaomi/Redmi/Poco `2717`, Motorola `22b8`:
+
+```sh
+lsusb
+echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="2717", MODE="0666", GROUP="plugdev"' \
+  | sudo tee /etc/udev/rules.d/51-android.rules
+sudo udevadm control --reload-rules && sudo udevadm trigger
+adb kill-server && adb devices
+```
+
+**No cable?** Android 11+ supports wireless debugging:
+**Developer options → Wireless debugging → Pair device with pairing code**, then
+
+```sh
+adb pair <phone-ip>:<pairing-port>      # enter the 6-digit code from the phone
+adb connect <phone-ip>:<port>           # the port under "Wireless debugging"
+adb devices
+```
+
+### 6.2 Let the phone reach your machine
+
+The phone must talk to your Linux box over the LAN, so:
+
+```sh
+hostname -I                    # your LAN IP, e.g. 192.168.1.20
+npm run dev:api                # binds all interfaces, so no extra flag needed
+curl http://$(hostname -I | awk '{print $1}'):4000/api/health   # from the PC first
+```
+
+Then open **`http://<LAN-IP>:4000/api/health`** in the phone's browser. If JSON
+comes back, the network path is proven and any later failure is in the app, not
+the network. If it does not:
+
+- Both must be on the **same Wi-Fi** — a phone on mobile data cannot reach it.
+- Guest networks and some routers enable **AP/client isolation**, which silently
+  blocks device→PC traffic. Test on your normal network.
+- Check the Linux firewall: `sudo ufw status`, then `sudo ufw allow 4000/tcp`.
+
+**Most robust option — skip the network entirely.** Over USB, `adb reverse`
+tunnels the phone's own loopback to your machine, so Wi-Fi, isolation, and the
+firewall all stop mattering:
+
+```sh
+adb reverse tcp:4000 tcp:4000
+```
+
+The base URL is compiled into the APK, so build with the matching address:
+
+```sh
+gradle :app:assembleDebug -PAPI_BASE_URL=http://127.0.0.1:4000 \
+  -PGOOGLE_WEB_CLIENT_ID=41843791180-aenmlq2okckiee7ounn3t1bulbh6pacv.apps.googleusercontent.com \
+  -PEMAIL_LINK_URL=https://auth.your-domain/verify-email
+```
+
+`adb reverse --remove-all` undoes it, and it must be re-run after the phone
+reconnects.
+
+### 6.3 Build, install, watch
+
+```sh
+cd apps/android
+gradle :app:assembleDebug \
+  -PAPI_BASE_URL=http://192.168.1.20:4000 \
+  -PGOOGLE_WEB_CLIENT_ID=41843791180-aenmlq2okckiee7ounn3t1bulbh6pacv.apps.googleusercontent.com \
+  -PEMAIL_LINK_URL=https://auth.your-domain/verify-email
+
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+adb logcat -s Zivora:V AndroidRuntime:E
+```
+
+Debug builds log under the tag **`Zivora`**: the resolved `API_BASE_URL` at
+startup, every API URL with its HTTP status, and the real exception behind the
+generic "could not be loaded" messages. That is the fastest way to tell a wrong
+base URL from a closed sign-up gate from a network problem. Nothing is logged in
+a release build, and no token, secret, or phone number is ever written.
+
+Cleartext HTTP works because `app/src/debug/AndroidManifest.xml` sets
+`usesCleartextTraffic="true"` — **debug builds only**. A release APK pointed at
+`http://<LAN-IP>` will fail; release needs HTTPS.
+
+Reset between runs:
+
+```sh
+adb shell pm clear com.zivora.app     # clears the encrypted session store
+adb uninstall com.zivora.app
+```
+
+### 6.4 What the phone can and cannot do today
+
+The fail-closed gates decide this, not the device:
+
+| Flow | Result right now | Why |
+|---|---|---|
+| Install, launch, consent screen renders | ✅ | |
+| `GET /api/v1/auth/policies` from the app | ✅ 200 | proves phone → PC networking |
+| Terms / Privacy links open | ❌ 404 | the pages in `site/` are not published yet |
+| Email-link and Google sign-in | ❌ `503 firebase_sign_in_disabled`, Google button disabled | `SIGNUP_ENABLED=false` until the policy pages are live |
+| Home / Profile balances | ⛔ unreachable | needs a session |
+| Phone OTP for a withdrawal | ⛔ unreachable | needs an account first |
+| Firebase SDK initialisation | ✅ | `google-services.json` matches `com.zivora.app` |
+
+So today's device test validates **the build, the UI, the network path, and
+Firebase initialisation** — worth doing, because those are exactly what has never
+been verified. To test sign-in end to end, publish the pages (`site/README.md`),
+then set `SIGNUP_ENABLED=true` and rebuild.
+
+Firebase also needs the **debug SHA-1** registered and Email link / Google /
+Phone enabled first — `docs/10_Firebase_Console_Checklist.md` steps 1–3. Without
+the SHA-1, Google sign-in fails with a configuration error and phone auth fails
+app verification.
+
+---
+
+## 7. Emulator on Linux (optional)
 
 An emulator needs KVM; without it, it is unusably slow.
 
@@ -277,7 +414,7 @@ hardware attestation.
 
 ---
 
-## 7. Release build
+## 8. Release build
 
 A release APK needs a signing keystore. Create it once and keep it safe: losing
 it means losing the ability to ever update the app.
@@ -301,7 +438,7 @@ from Play Console → Setup → App integrity if you enrol. Details in
 
 ---
 
-## 8. Quick reference
+## 9. Quick reference
 
 ```sh
 # --- first time only -------------------------------------------------------
@@ -329,7 +466,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ---
 
-## 9. Linux troubleshooting
+## 10. Linux troubleshooting
 
 | Symptom | Cause | Fix |
 |---|---|---|
@@ -340,7 +477,11 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 | `sdkmanager: command not found` | cmdline-tools not on PATH | re-run the `~/.bashrc` block in §3, then `exec $SHELL -l` |
 | `emulator: KVM acceleration not available` | No KVM, or user not in `kvm` group | §6, then log out and back in |
 | `adb: no devices/emulators found` | USB debugging off, or no udev rule | Enable Developer options → USB debugging; for a physical phone add an udev rule for the vendor id, then `adb kill-server && adb devices` |
-| App cannot reach the API | Used `localhost`, or firewall | `10.0.2.2` (emulator) or LAN IP (device); `sudo ufw allow 4000/tcp` |
+| App cannot reach the API | Used `localhost`, or firewall | `10.0.2.2` (emulator) or LAN IP (device); `sudo ufw allow 4000/tcp`; open `http://<LAN-IP>:4000/api/health` in the phone's browser to isolate it (§6.2) |
+| `adb devices` shows `unauthorized` | Debugging prompt not accepted | Accept on the phone, then `adb kill-server && adb devices` |
+| `adb devices` shows `no permissions` | Missing udev rule | §6.1 — add the rule for your vendor id from `lsusb` |
+| Phone and PC on the same Wi-Fi but no connection | AP / client isolation | Use a normal network, not a guest SSID — or sidestep it: `adb reverse tcp:4000 tcp:4000` and rebuild with `-PAPI_BASE_URL=http://127.0.0.1:4000` (§6.2) |
+| Release build cannot reach `http://<LAN-IP>` | Cleartext blocked outside debug | Debug builds allow it; release needs HTTPS |
 | `npm run dev:api` exits immediately | Neon unreachable — boot gate | `docs/11` §6 |
 | `verify:local` reports `ENV` on migrations | Network cannot reach `*.neon.tech:5432` | Check VPN/proxy/firewall; Neon must be reachable on port 5432 |
 | Gradle download stalls | Corporate proxy | `export GRADLE_OPTS=-Dhttps.proxyHost=… -Dhttps.proxyPort=…` |

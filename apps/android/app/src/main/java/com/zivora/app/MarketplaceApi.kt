@@ -112,8 +112,10 @@ class MarketplaceApi(private val baseUrl: String = BuildConfig.API_BASE_URL) {
             val response = if (body.isBlank()) JSONObject() else JSONObject(body)
 
             if (status !in 200..299) {
+                DebugLog.w("GET ${connection.url} -> $status")
                 throw IllegalStateException(response.optString("error", "Request failed."))
             }
+            DebugLog.d("GET ${connection.url} -> $status")
 
             return response
         } finally {

@@ -77,6 +77,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // The most common device-testing mistake is a wrong base URL: a phone
+        // cannot use localhost, and 10.0.2.2 only means anything to an emulator.
+        DebugLog.d("API_BASE_URL=${BuildConfig.API_BASE_URL} package=$packageName debug=${BuildConfig.DEBUG}")
         incomingVerificationLink.value = intent?.data
         enableEdgeToEdge()
         setContent {
@@ -497,7 +500,8 @@ private fun HomeScreen(
         loadError = null
         try {
             overview = api.loadHome(session?.accessToken)
-        } catch (_: Exception) {
+        } catch (error: Exception) {
+            DebugLog.w("home load failed against ${BuildConfig.API_BASE_URL}", error)
             overview = null
             loadError = "Live marketplace data could not be loaded. Check your connection and reopen the tab."
         } finally {
@@ -687,7 +691,8 @@ private fun ProfileScreen(
         loadError = null
         try {
             profile = api.loadProfile(session?.accessToken)
-        } catch (_: Exception) {
+        } catch (error: Exception) {
+            DebugLog.w("profile load failed against ${BuildConfig.API_BASE_URL}", error)
             profile = null
             loadError = "Profile data could not be loaded. Check your connection and reopen the tab."
         }

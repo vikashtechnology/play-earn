@@ -2,6 +2,7 @@ package com.zivora.app.auth
 
 import android.net.Uri
 import com.zivora.app.BuildConfig
+import com.zivora.app.DebugLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -218,10 +219,12 @@ class AuthApi(private val baseUrl: String = BuildConfig.API_BASE_URL) {
             val response = if (body.isBlank()) JSONObject() else JSONObject(body)
 
             if (status !in 200..299) {
+                val code = response.optionalString("code")
+                DebugLog.w("API ${connection.url} -> $status${code?.let { " code=$it" } ?: ""}")
                 throw AuthApiException(
                     statusCode = status,
                     message = response.optString("error").ifBlank { defaultMessage(status) },
-                    code = response.optionalString("code"),
+                    code = code,
                 )
             }
 
