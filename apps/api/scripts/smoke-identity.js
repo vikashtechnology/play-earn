@@ -2,8 +2,9 @@
 //
 // It writes synthetic records to the configured Neon database, asserts the
 // guarantees the platform depends on (unique Firebase UID, wallet creation,
-// versioned consent, phone uniqueness for Minimum KYC, session revocation, and
-// the auth event trail), then deletes everything it created.
+// versioned consent, phone uniqueness for Minimum KYC including refresh and
+// adoption paths, verified-contact rules, session revocation, and the auth
+// event trail), then deletes everything it created.
 //
 // Requires: POSTGRES_URL / MIGRATIONS_DATABASE_URL pointing at Neon with
 // migration 005 applied. Run: npm --workspace @rewards-platform/api run smoke:identity
@@ -24,6 +25,7 @@ const primaryUid = `smoke-uid-${runId}`;
 const secondUid = `smoke-uid-second-${runId}`;
 const email = `smoke-${runId}@example.invalid`;
 const phone = `+916${randomInt(100000000, 1000000000)}`;
+const secondPhone = `+917${randomInt(100000000, 1000000000)}`;
 
 const consent = {
   adultConfirmed: true,
@@ -43,6 +45,7 @@ function firebaseIdentity(overrides = {}) {
     email,
     emailVerified: true,
     phoneNumber: null,
+    phoneVerified: false,
     displayName: 'Synthetic Smoke User',
     photoUrl: null,
     signInProvider: 'google.com',
@@ -118,12 +121,55 @@ try {
     uid: `${secondUid}-phone`,
     email: `smoke-phone-${runId}@example.invalid`,
     phoneNumber: phone,
+    phoneVerified: true,
     signInProvider: 'phone.com',
   }), consent);
   assert(phoneTakeover.conflict === 'phone_already_linked', 'a second account adopted an already-linked phone');
   if (phoneTakeover.id) {
     createdUserIds.push(phoneTakeover.id);
   }
+
+  // 5b. A returning sign-in must not adopt a phone another account owns. This
+  //     is the path that a UNIQUE violation would otherwise turn into a 500.
+  const refreshTakeover = await identity.upsertFirebaseUser(firebaseIdentity({
+    phoneNumber: phone,
+    phoneVerified: true,
+  }));
+  assert(refreshTakeover.conflict === 'phone_already_linked', 'a refresh adopted an already-linked phone');
+
+  // 5c. PostgreSQL allows many NULLs in a UNIQUE column, so accounts without a
+  //     phone must coexist. The in-memory emulator used in unit tests cannot
+  //     verify this, which is why it belongs here.
+  const nullPhoneUser = await identity.upsertFirebaseUser(firebaseIdentity({
+    uid: `${secondUid}-nullphone`,
+    email: `smoke-nullphone-${runId}@example.invalid`,
+    phoneNumber: null,
+  }), consent);
+  assert(nullPhoneUser.created === true, 'a second account without a phone could not be created');
+  if (nullPhoneUser.id) {
+    createdUserIds.push(nullPhoneUser.id);
+  }
+
+  // 5d. Only a Firebase-verified claim may set phone_verified_at.
+  const unverifiedPhoneUser = await identity.upsertFirebaseUser(firebaseIdentity({
+    uid: `${secondUid}-unverified`,
+    email: `smoke-unverified-${runId}@example.invalid`,
+    phoneNumber: secondPhone,
+    phoneVerified: false,
+    signInProvider: 'phone.com',
+  }), consent);
+  assert(unverifiedPhoneUser.created === true, 'an account with an unverified phone could not be created');
+  assert(
+    unverifiedPhoneUser.phone_verified_at === null,
+    'an unverified phone claim was recorded as verified',
+  );
+  if (unverifiedPhoneUser.id) {
+    createdUserIds.push(unverifiedPhoneUser.id);
+  }
+
+  // 5e. Minimum KYC refuses a phone that belongs to a different account.
+  const kycRejected = await identity.markMinimumKycVerified(nullPhoneUser.id, phone, `${secondUid}-nullphone`);
+  assert(kycRejected === false, 'Minimum KYC accepted a phone owned by another account');
 
   // 6. Session revocation persists a watermark for API tokens.
   const revoked = await identity.revokeSessionsBefore(created.id, new Date());
@@ -182,7 +228,7 @@ try {
   const pruned = await identity.pruneAuthEvents(540);
   assert(pruned === 0, 'retention pruning removed recent authentication events');
 
-  console.log('IDENTITY_NEON_SMOKE_OK (firebase identity, wallet, consent, Minimum KYC, revocation, audit trail)');
+  console.log('IDENTITY_NEON_SMOKE_OK (firebase identity, wallet, consent, contact uniqueness, Minimum KYC, revocation, audit trail)');
 } catch (error) {
   console.error('IDENTITY_NEON_SMOKE_FAILED');
   console.error(error instanceof Error ? error.message : String(error));
