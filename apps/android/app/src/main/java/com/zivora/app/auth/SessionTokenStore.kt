@@ -1,4 +1,4 @@
-package com.rewardsplatform.app.auth
+package com.zivora.app.auth
 
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec

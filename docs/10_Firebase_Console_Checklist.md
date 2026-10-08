@@ -1,27 +1,27 @@
 # 10 — Firebase Console Checklist (`play-f9fe2`)
 
 **Project:** `play-f9fe2` · **Project number:** `41843791180` · **Console:** https://console.firebase.google.com/project/play-f9fe2
-**Decision recorded:** the app's `applicationId` stays **`com.rewardsplatform.app`**, so that package must be registered in Firebase.
+**Decision recorded:** the app's `applicationId` stays **`com.zivora.app`**, so that package must be registered in Firebase.
 
 Work top to bottom. Steps 0–3 are required before any auth flow works on a device;
 steps 4–8 are hardening and cleanup.
 
 ---
 
-## Step 0 — Register `com.rewardsplatform.app` (blocking)
+## Step 0 — Register `com.zivora.app` (blocking)
 
 The committed `apps/android/app/google-services.json` currently registers only
 `package_name: com.playgames.app`. The google-services Gradle plugin matches on
 `applicationId`, so the build fails with:
 
 ```
-No matching client found for package name 'com.rewardsplatform.app'
+No matching client found for package name 'com.zivora.app'
 ```
 
 Fix:
 
 1. **Project settings → Your apps → Add app → Android**.
-2. Package name: `com.rewardsplatform.app` (exactly — no `.debug` suffix).
+2. Package name: `com.zivora.app` (exactly — no `.debug` suffix).
 3. App nickname: `Play & Earn Real Cash`. Debug signing certificate SHA-1: paste
    it now if you have it (Step 1), otherwise add it later.
 4. **Download `google-services.json`** and replace
@@ -33,7 +33,7 @@ Fix:
    ```
 
 The new file will contain **two** `client` entries (`com.playgames.app` and
-`com.rewardsplatform.app`). That is fine — the plugin selects by
+`com.zivora.app`). That is fine — the plugin selects by
 `applicationId`. Once the app builds, delete the unused `com.playgames.app`
 registration (**Your apps → ⋮ → Remove app**) so nobody wires the wrong one later.
 
@@ -60,7 +60,7 @@ cd apps/android
 ```
 
 Copy **SHA-1** and **SHA-256** for the `debug` variant into
-**Project settings → Your apps → `com.rewardsplatform.app` → Add fingerprint**.
+**Project settings → Your apps → `com.zivora.app` → Add fingerprint**.
 
 For release, create a keystore first (**never commit it** — it is already
 git-ignored via `*.jks`/`local.properties`; keep an offline backup, because
@@ -134,7 +134,7 @@ So before email sign-in can work you must:
 
 4. For App Links without the disambiguation dialog, host
    `https://auth.<your-domain>/.well-known/assetlinks.json` containing the
-   release signing certificate SHA-256 and `com.rewardsplatform.app`, and set
+   release signing certificate SHA-256 and `com.zivora.app`, and set
    `android:autoVerify="true"` on the intent filter.
 
 A cheap path: host the page on the same GitHub Pages site as the legal pages in
@@ -150,7 +150,7 @@ dialog; that is acceptable for testing, not ideal for launch.
 Recommended before any public release: it stops non-app clients from calling
 Firebase Auth with your project credentials.
 
-1. **App Check → Apps → `com.rewardsplatform.app` → Register** with the SHA-256
+1. **App Check → Apps → `com.zivora.app` → Register** with the SHA-256
    from Step 1.
 2. **Providers → Play Integrity → Enable.**
 3. Test the flows still work, then consider **enforcing** per API
@@ -187,7 +187,7 @@ The Android API key in `google-services.json` is public by design, but it should
 still be scoped:
 
 1. **Project settings → API keys → the Android key → Edit.**
-2. **Application restrictions → Android apps** → add `com.rewardsplatform.app`
+2. **Application restrictions → Android apps** → add `com.zivora.app`
    with the SHA-1 fingerprints from Step 1.
 3. **API restrictions → Restrict key** → allow only **Identity Toolkit API** and
    **Token Service API** (add **Cloud Messaging** later if you add push).
@@ -236,7 +236,7 @@ minted for a different Firebase project), and `phone_verification_required`
 
 ## Tick list
 
-- [ ] `com.rewardsplatform.app` registered; new `google-services.json` in `apps/android/app/`
+- [ ] `com.zivora.app` registered; new `google-services.json` in `apps/android/app/`
 - [ ] `npm run config:check` shows no package-name BLOCK
 - [ ] Debug SHA-1 **and** SHA-256 added
 - [ ] Release keystore created, backed up offline, fingerprints added

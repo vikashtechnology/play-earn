@@ -25,7 +25,7 @@ const repoRoot = path.resolve(apiRoot, '..', '..');
 const envPath = path.join(apiRoot, '.env');
 const googleServicesPath = path.join(repoRoot, 'apps', 'android', 'app', 'google-services.json');
 
-const ANDROID_PACKAGE = 'com.rewardsplatform.app';
+const ANDROID_PACKAGE = 'com.zivora.app';
 const PLACEHOLDER_VALUES = new Set([
   '',
   'REPLACE-WITH-YOUR-FIREBASE-PROJECT-ID',

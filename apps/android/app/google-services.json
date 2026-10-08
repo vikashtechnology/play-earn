@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:41843791180:android:bafa9c604bfd48219eabe9",
+        "mobilesdk_app_id": "1:41843791180:android:d834f87a38947c189eabe9",
         "android_client_info": {
-          "package_name": "com.playgames.app"
+          "package_name": "com.zivora.app"
         }
       },
       "oauth_client": [

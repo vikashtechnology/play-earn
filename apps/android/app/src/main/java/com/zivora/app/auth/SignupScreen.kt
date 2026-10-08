@@ -1,4 +1,4 @@
-package com.rewardsplatform.app.auth
+package com.zivora.app.auth
 
 import android.content.Context
 import android.content.Intent
@@ -38,8 +38,8 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.rewardsplatform.app.BuildConfig
-import com.rewardsplatform.app.ui.theme.RewardsTokens
+import com.zivora.app.BuildConfig
+import com.zivora.app.ui.theme.RewardsTokens
 import java.security.SecureRandom
 import kotlinx.coroutines.launch
 

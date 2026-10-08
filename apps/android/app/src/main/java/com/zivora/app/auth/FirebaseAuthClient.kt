@@ -1,4 +1,4 @@
-package com.rewardsplatform.app.auth
+package com.zivora.app.auth
 
 import android.app.Activity
 import com.google.firebase.FirebaseException
@@ -14,7 +14,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
-import com.rewardsplatform.app.BuildConfig
+import com.zivora.app.BuildConfig
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException

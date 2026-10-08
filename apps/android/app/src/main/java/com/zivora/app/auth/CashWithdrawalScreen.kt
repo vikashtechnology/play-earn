@@ -1,4 +1,4 @@
-package com.rewardsplatform.app.auth
+package com.zivora.app.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,7 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.rewardsplatform.app.ui.theme.RewardsTokens
+import com.zivora.app.ui.theme.RewardsTokens
 import kotlinx.coroutines.launch
 import java.util.UUID
 

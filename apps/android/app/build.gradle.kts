@@ -18,11 +18,11 @@ val emailLinkUrl = providers.gradleProperty("EMAIL_LINK_URL")
 val emailLinkUri = URI.create(emailLinkUrl)
 
 android {
-    namespace = "com.rewardsplatform.app"
+    namespace = "com.zivora.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.rewardsplatform.app"
+        applicationId = "com.zivora.app"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

@@ -13,7 +13,7 @@ Kotlin + Jetpack Compose Android application for **Play & Earn Real Cash**, an I
 
 - Open this directory in Android Studio.
 - Use JDK 17, Android SDK 36, and Gradle 8.11.1+ (Android Gradle Plugin 8.9.1).
-- The committed `app/google-services.json` is for Firebase project `play-f9fe2` but registers `package_name: com.playgames.app`, while this app's `applicationId` is `com.rewardsplatform.app`. **The build fails until that package is registered in Firebase** and the file is re-downloaded — see `docs/10_Firebase_Console_Checklist.md` step 0. `npm run config:check` reports this as a BLOCK.
+- The committed `app/google-services.json` is for Firebase project `play-f9fe2` but registers `package_name: com.playgames.app`, while this app's `applicationId` is `com.zivora.app`. **The build fails until that package is registered in Firebase** and the file is re-downloaded — see `docs/10_Firebase_Console_Checklist.md` step 0. `npm run config:check` reports this as a BLOCK.
 - Build with the environment properties you need:
 
 ```sh

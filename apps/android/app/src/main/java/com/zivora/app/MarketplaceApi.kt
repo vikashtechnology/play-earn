@@ -1,4 +1,4 @@
-package com.rewardsplatform.app
+package com.zivora.app
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

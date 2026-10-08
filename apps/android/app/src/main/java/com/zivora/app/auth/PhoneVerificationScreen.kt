@@ -1,4 +1,4 @@
-package com.rewardsplatform.app.auth
+package com.zivora.app.auth
 
 import android.app.Activity
 import android.content.Context
@@ -36,7 +36,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
-import com.rewardsplatform.app.ui.theme.RewardsTokens
+import com.zivora.app.ui.theme.RewardsTokens
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

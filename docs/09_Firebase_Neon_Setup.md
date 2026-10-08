@@ -11,7 +11,7 @@ live sign-in: the API fails closed until these values are real.
 > in **`10_Firebase_Console_Checklist.md`**. This section is the general shape.
 
 1. Create a project at https://console.firebase.google.com.
-2. **Add an Android app** with package name `com.rewardsplatform.app`.
+2. **Add an Android app** with package name `com.zivora.app`.
    - Register the debug SHA-1 (and SHA-256) from `./gradlew signingReport`, plus
      release signing fingerprints before a closed test.
    - Download `google-services.json` and replace
@@ -193,7 +193,7 @@ Two claim details matter when testing against a real Firebase project:
 `npm run config:check` validates everything above **without touching the
 network** and prints each gate as `ok` / `warn` / `BLOCK` with the exact fix. It
 cross-checks `apps/android/app/google-services.json` against the server env
-(project id must match, package must be `com.rewardsplatform.app`, and it reports
+(project id must match, package must be `com.zivora.app`, and it reports
 the web OAuth client id you need for `GOOGLE_WEB_CLIENT_ID`), then evaluates
 `isFirebaseSignInEnabled` using the same helpers the auth route uses, so it can
 never disagree with the API. Exit code 1 means sign-in is still closed.

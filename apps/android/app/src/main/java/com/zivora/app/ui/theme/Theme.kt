@@ -1,4 +1,4 @@
-package com.rewardsplatform.app.ui.theme
+package com.zivora.app.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme

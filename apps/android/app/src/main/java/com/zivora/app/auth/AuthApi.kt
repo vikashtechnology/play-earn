@@ -1,7 +1,7 @@
-package com.rewardsplatform.app.auth
+package com.zivora.app.auth
 
 import android.net.Uri
-import com.rewardsplatform.app.BuildConfig
+import com.zivora.app.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject

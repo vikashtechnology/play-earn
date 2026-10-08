@@ -1,4 +1,4 @@
-package com.rewardsplatform.app
+package com.zivora.app
 
 import android.os.Bundle
 import android.content.Context
@@ -46,15 +46,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.rewardsplatform.app.auth.AuthApi
-import com.rewardsplatform.app.auth.CashWithdrawalScreen
-import com.rewardsplatform.app.auth.FirebaseAuthClient
-import com.rewardsplatform.app.auth.PhoneVerificationScreen
-import com.rewardsplatform.app.auth.SessionTokenStore
-import com.rewardsplatform.app.auth.SignupScreen
-import com.rewardsplatform.app.auth.UserSession
-import com.rewardsplatform.app.ui.theme.RewardsMarketplaceTheme
-import com.rewardsplatform.app.ui.theme.RewardsTokens
+import com.zivora.app.auth.AuthApi
+import com.zivora.app.auth.CashWithdrawalScreen
+import com.zivora.app.auth.FirebaseAuthClient
+import com.zivora.app.auth.PhoneVerificationScreen
+import com.zivora.app.auth.SessionTokenStore
+import com.zivora.app.auth.SignupScreen
+import com.zivora.app.auth.UserSession
+import com.zivora.app.ui.theme.RewardsMarketplaceTheme
+import com.zivora.app.ui.theme.RewardsTokens
 import kotlinx.coroutines.launch
 
 private enum class MarketplaceTab(val title: String) {
