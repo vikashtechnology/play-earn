@@ -17,10 +17,6 @@ coverage/
 **/.idea/
 **/.DS_Store
 
-# neonctl local project context
-.neon
-.neon/
-
 # OS
 Thumbs.db
 .DS_Store

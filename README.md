@@ -59,8 +59,7 @@ play-earn/
 ```sh
 npm install
 cp apps/api/.env.example apps/api/.env       # set Neon + Firebase values
-npm run neon:login && npm run neon:setup     # Neon CLI: auth, then create the project
-npm run neon:cs && npm run neon:cs:direct    # paste both into apps/api/.env
+# paste the Neon pooled + direct strings into apps/api/.env (console -> Connect)
 npm --workspace @rewards-platform/api run migrate
 npm run config:check                         # validates .env + google-services.json, lists blocking gates
 npm run dev:api                              # http://localhost:4000/api/health

@@ -87,7 +87,7 @@ function checkDatabaseUrl(label, value, { pooled }) {
     block(
       stillExample ? `${label} is still the .env.example value` : `${label} is not a parseable connection string`,
       stillExample
-        ? `Paste the ${pooled ? 'pooled' : 'direct'} string from \`npm run neon:cs${pooled ? '' : ':direct'}\`.`
+        ? `Paste the ${pooled ? 'pooled' : 'direct'} string from the Neon console (Connect).`
         : 'Check for unencoded special characters in the password.',
     );
     return null;
@@ -118,7 +118,7 @@ function checkDatabaseUrl(label, value, { pooled }) {
   }
 
   if (problems.length > 0) {
-    block(`${label}: ${problems.join('; ')}`, 'Compare against the string from `npm run neon:cs` / `npm run neon:cs:direct`.');
+    block(`${label}: ${problems.join('; ')}`, 'Compare against the Pooled and Direct strings in the Neon console (Connect).');
     return url;
   }
 
