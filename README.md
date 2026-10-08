@@ -42,7 +42,8 @@ play-earn/
 │   ├── shared-types/
 │   └── validation/       # request parsers shared by API routes
 ├── infrastructure/
-├── docs/
+├── docs/                 # numbered design docs, tasks, and project memory
+├── site/                 # publishable Terms, Privacy Notice, and deletion pages
 └── memory.md
 ```
 
@@ -67,6 +68,8 @@ npm test                                     # 122 unit, route, and SQL tests �
 npm run build                                # syntax + migration checks
 npm --workspace @rewards-platform/api run smoke:identity   # against real Neon
 ```
+
+`site/` holds the static legal pages the app links to (Terms, Privacy Notice, account deletion), deployable to GitHub Pages by `.github/workflows/pages.yml`; see `site/README.md` for the placeholders that must be filled and the version strings the API expects.
 
 `npm test` covers three layers without any external service: domain and route unit tests, request-schema tests, and `src/db/repository.integration.test.js`, which applies every migration and exercises the real repository SQL against `pg-mem` (an in-memory PostgreSQL emulator). The emulator implements a subset of PostgreSQL, so `scripts/smoke-identity.js` against real Neon remains the authoritative pre-launch check.
 

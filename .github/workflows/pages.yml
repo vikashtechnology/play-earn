@@ -1,0 +1,54 @@
+name: Deploy legal pages
+
+# Publishes site/ to GitHub Pages so TERMS_URL, PRIVACY_URL, and
+# ACCOUNT_DELETION_URL resolve to real https pages. Enable Pages first:
+# Settings -> Pages -> Build and deployment -> Source = GitHub Actions.
+# See site/README.md for the placeholders that must be replaced beforehand.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      # Fail the build rather than publish a page with unfilled placeholders.
+      - name: Reject unfilled placeholders
+        run: |
+          if grep -rIn "\[Legal entity name\]\|\[support email\]\|\[Grievance Officer name\]\|\[grievance email\]\|\[Registered address\]\|\[Postal address\]\|\[City, State\]" site/ ; then
+            echo "::error::site/ still contains bracketed placeholders. Fill them in (see site/README.md) before publishing."
+            exit 1
+          fi
+          echo "No placeholders remain."
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

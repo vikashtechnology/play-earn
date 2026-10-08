@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Notice — Play &amp; Earn Real Cash</title>
+<meta name="description" content="Privacy Notice for Play &amp; Earn Real Cash under India's Digital Personal Data Protection Act 2023: what we collect, why, who we share it with, how long we keep it, and your rights.">
+<meta name="robots" content="index,follow">
+<link rel="stylesheet" href="assets/policy.css">
+</head>
+<body>
+<main>
+
+<header class="doc-head">
+  <p class="brand">Play &amp; Earn Real Cash</p>
+  <h1>Privacy Notice</h1>
+  <p class="meta">Version <code>privacy-2026-10-08</code> &nbsp;·&nbsp; Effective 8 October 2026 &nbsp;·&nbsp; India</p>
+</header>
+
+<div class="keypoints">
+  <h2>In short</h2>
+  <ul>
+    <li>We are a <strong>Data Fiduciary</strong> under India's DPDP Act 2023; you are the Data Principal.</li>
+    <li>We collect only what a rewards marketplace needs: sign-in identity, your coin ledger, your consents, and payout details you choose to give.</li>
+    <li>Sign-in is handled by <strong>Firebase Authentication (Google)</strong>. We never see or store your password or OTP code.</li>
+    <li>For fraud checks we store <strong>hashes</strong> of your IP address and app version — not the raw values.</li>
+    <li>Your database is hosted on <strong>Neon Postgres in AWS US East 2 (Ohio, USA)</strong> — a cross-border transfer, disclosed below.</li>
+    <li>We <strong>never sell</strong> your personal data.</li>
+    <li>Analytics and personalised offers are <strong>separate optional choices</strong>, and you can change them at any time.</li>
+    <li>Advertising coins and ad personalisation are handled through Google's AdMob SDK, subject to your choice.</li>
+    <li>Your session token is encrypted on your device with the Android Keystore.</li>
+  </ul>
+</div>
+
+<h2>1. Who we are</h2>
+<p><strong>[Legal entity name]</strong>, with its registered office at <strong>[Registered address]</strong>, is the Data Fiduciary responsible for the personal data processed by the Play &amp; Earn Real Cash application and its services (the "Platform").</p>
+<p>Questions about this Notice, requests to exercise your rights, and complaints can be sent to <strong>[support email]</strong>, or to our Grievance Officer named in section 12.</p>
+
+<h2>2. What we collect, and why</h2>
+<table>
+  <thead><tr><th>Data</th><th>Purpose</th><th>Legal basis</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Sign-in identity</strong> — a provider user ID, your email address and whether it is verified, your phone number and whether it is verified, your display name, and profile photo URL</td>
+      <td>Creating and securing one account per person; contacting you about your account and rewards</td>
+      <td>Consent, and legitimate use for providing the service you asked for</td>
+    </tr>
+    <tr>
+      <td><strong>Adult self-declaration</strong> — your confirmation that you are 18 or older, with a timestamp</td>
+      <td>Age eligibility, and eligibility for cash rewards</td>
+      <td>Consent plus a legal obligation</td>
+    </tr>
+    <tr>
+      <td><strong>Consent records</strong> — which version of the Terms and Privacy Notice you accepted, when, and your separate choices on analytics and personalised offers</td>
+      <td>Proving what you agreed to; honouring your preferences</td>
+      <td>Legal obligation and consent</td>
+    </tr>
+    <tr>
+      <td><strong>Reward ledger</strong> — coin credits and debits with their source (offer, referral, promo, advertising), status, references, and timestamps; your redemption requests and history</td>
+      <td>Showing your balance, settling rewards, resolving disputes, accounting, and preventing double-credit</td>
+      <td>Legitimate use for the service; legal obligation for financial records</td>
+    </tr>
+    <tr>
+      <td><strong>Payout details</strong> — the UPI ID or bank account you submit, your Minimum KYC status and verification timestamp, and payout records including any tax deducted</td>
+      <td>Paying you, verifying that the account is yours, and meeting payment and tax obligations</td>
+      <td>Consent and legal obligation</td>
+    </tr>
+    <tr>
+      <td><strong>Security and fraud signals</strong> — a <em>hash</em> of your IP address, a <em>hash</em> of your app/device string, sign-in attempts and their outcomes, and device signals our partners report (install referrer, advertising identifier where permitted, device model, OS version)</td>
+      <td>Detecting fake accounts, bots, sideloaded installs, referral abuse, and payout fraud; rate-limiting</td>
+      <td>Legitimate use to protect the service and other users</td>
+    </tr>
+    <tr>
+      <td><strong>Support records</strong> — what you send us through in-app support or email, and our replies</td>
+      <td>Resolving your issue and meeting grievance-redressal obligations</td>
+      <td>Consent and legal obligation</td>
+    </tr>
+    <tr>
+      <td><strong>Product orders</strong> — delivery name, address, and phone number where you order a physical reward</td>
+      <td>Fulfilment and delivery</td>
+      <td>Consent and performance of your request</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>We do <strong>not</strong> collect your password, your one-time passcodes, your contacts, your photos or gallery, your location, your microphone or camera input, or your browsing history outside the app. Sign-in secrets stay with the authentication provider; we only receive the verified result.</p>
+
+<h2>3. Sign-in and how your credentials are handled</h2>
+<ul>
+  <li>Authentication is provided by <strong>Firebase Authentication (Google LLC)</strong> using email link, Google sign-in, or phone OTP. Google verifies you and issues a short-lived signed token.</li>
+  <li>Our server independently verifies that token's signature against Google's published signing certificates before it trusts anything in it. We never accept an identity claimed by the app alone.</li>
+  <li>We then issue our own platform session token, valid for <strong>15 minutes</strong>. Your device stores it encrypted with the <strong>Android Keystore</strong> (AES/GCM). We do not store a copy of your Firebase credential on your device or in our database.</li>
+  <li>Anonymous sign-in and custom tokens are refused, so every balance belongs to a verifiable identity.</li>
+  <li>Signing out revokes your platform sessions server-side.</li>
+  <li>Google processes authentication data under its own terms — see the Firebase/Google disclosures in section 6.</li>
+</ul>
+
+<h2>4. Advertising</h2>
+<p>The app shows rewarded video advertising through <strong>Google AdMob</strong>. Google and its partners may use cookies and identifiers, including the advertising ID where permitted by your device settings, to serve ads. Coins earned from ads are labelled as in-app only and are never redeemable for cash or gift cards.</p>
+<p>Personalised advertising and personalised offers are controlled by a <strong>separate preference you set when you sign up</strong>, which you can change at any time in the app under Profile → Preferences. Turning personalisation off does not remove ads; it makes them non-personalised. You can also reset or opt out of advertising-ID-based personalisation in your Android settings (Settings → Google → Ads), and we honour that choice.</p>
+
+<h2>5. What we do not do</h2>
+<ul>
+  <li>We do not sell, rent, or trade your personal data.</li>
+  <li>We do not use your data to train third-party models.</li>
+  <li>We do not ask for, or store, your bank password, UPI PIN, OTP codes, card numbers, or Aadhaar/PAN images. Payouts are made to a UPI ID or bank account you provide, processed by a licensed payment partner.</li>
+  <li>We do not run a credit check or build a credit profile on you.</li>
+  <li>We do not send marketing by SMS unless you have opted in, and any such messaging complies with TRAI DLT registration requirements.</li>
+</ul>
+
+<h2>6. Who we share data with</h2>
+<table>
+  <thead><tr><th>Recipient</th><th>What they receive</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Firebase Authentication / Google</td><td>Sign-in credentials you give them, device and usage data per their terms</td><td>Verifying who you are; delivering ads via AdMob</td></tr>
+    <tr><td>Neon (serverless Postgres), hosted on AWS US East 2 (Ohio, USA)</td><td>The account, ledger, consent, and audit records described above</td><td>Our primary database</td></tr>
+    <tr><td>Offer and affiliate partners</td><td>A pseudonymous click or transaction identifier, the offer completed, its status, and where necessary your country and device type</td><td>Confirming that your activity was genuine so the reward can be credited</td></tr>
+    <tr><td>Payment and payout providers (for example Razorpay / RazorpayX)</td><td>Your name, UPI ID or bank details, and payout amount</td><td>Processing withdrawals and product co-payments, and meeting KYC and tax obligations</td></tr>
+    <tr><td>Gift-card fulfilment providers</td><td>Your delivery email or in-app identifier and the reward selected</td><td>Issuing the voucher</td></tr>
+    <tr><td>Product sellers and couriers</td><td>Delivery name, address, phone number, and order details</td><td>Shipping a physical reward</td></tr>
+    <tr><td>Transactional email provider (for example Resend)</td><td>Your email address and the message content</td><td>Receipts and support replies — not sign-in, which Firebase handles</td></tr>
+    <tr><td>Analytics providers</td><td>Aggregated or pseudonymised usage events</td><td><strong>Only if you opted in.</strong> Never used to identify you to advertisers.</td></tr>
+    <tr><td>Professional advisers, and regulators, courts, or law enforcement</td><td>Only what we are legally required or permitted to disclose</td><td>Legal obligation, legal claims, tax authorities, or a valid request under Indian law</td></tr>
+  </tbody>
+</table>
+<p>Every recipient is bound by contract to process your data only for the stated purpose and to protect it. We do not authorise any of them to use your personal data for their own marketing.</p>
+
+<h2>7. Cross-border transfers</h2>
+<p>Your personal data is stored and processed in India where possible, but some processors operate outside India. In particular, our <strong>Neon Postgres database is hosted on AWS in US East 2 (Ohio, USA)</strong>, and <strong>Firebase Authentication and AdMob are operated globally by Google</strong>. Data in transit to these services is protected with TLS, with certificate verification enforced for database connections, and providers encrypt stored data at rest.</p>
+<p>These transfers are permitted under the DPDP Act 2023 unless the Central Government restricts transfer to a specific country. If you would rather not have your data transferred outside India, do not use the Platform, or write to us and we will explain what this means for your account.</p>
+
+<h2>8. How long we keep data</h2>
+<table>
+  <thead><tr><th>Data</th><th>Retention</th></tr></thead>
+  <tbody>
+    <tr><td>Account identity and profile</td><td>While your account is open, then deleted or irreversibly anonymised after closure, subject to the exceptions below</td></tr>
+    <tr><td>Coin ledger and redemption history</td><td>Life of the account, plus the period required for accounting, tax, and dispute resolution</td></tr>
+    <tr><td>Authentication and fraud events</td><td><strong>540 days</strong> (about 18 months), then automatically pruned</td></tr>
+    <tr><td>Consent records (Terms and Privacy versions, preferences)</td><td>Life of the account and as long as needed to demonstrate lawful processing; the most recent version of each consent type is what we act on</td></tr>
+    <tr><td>Payout and KYC records</td><td>As required by payment, KYC, and tax law — typically five years or more</td></tr>
+    <tr><td>Support tickets and grievance records</td><td>Three years from closure, or longer where a legal obligation applies</td></tr>
+    <tr><td>Platform session tokens</td><td>15 minutes; a revocation watermark is kept so old tokens cannot be reused</td></tr>
+  </tbody>
+</table>
+<p>The reward ledger and administrative actions on it are append-only: we never rewrite history. Corrections are made by adding a new entry that reverses an old one, which is why disputed rewards can be traced.</p>
+
+<h2>9. How we protect data</h2>
+<ul>
+  <li>Transport encryption (TLS) for every network call, with certificate verification enforced against the database provider.</li>
+  <li>Encryption at rest by our infrastructure providers.</li>
+  <li>On-device session tokens encrypted with hardware-backed Android Keystore; nothing sensitive is written to plain local storage.</li>
+  <li>No provider secret, service-account key, database credential, or SMS/email API key is shipped inside the app.</li>
+  <li>Fraud signals are stored as one-way hashes rather than raw values where the raw value is not needed.</li>
+  <li>Server-side verification of every identity claim; clients cannot assert their own user ID, email, phone, balance, or payout status.</li>
+  <li>Rate limiting, short-lived sessions, and session revocation on sign-out.</li>
+  <li>Append-only audit logs for money-moving and administrative actions.</li>
+  <li>Access to production data on a need-to-know basis, with logged administrative actions.</li>
+</ul>
+<p>No system is perfectly secure. If a breach affects your personal data in a way the law requires us to report, we will notify you and the Data Protection Board of India without unreasonable delay.</p>
+
+<h2>10. Your rights</h2>
+<p>Under the DPDP Act 2023 you may:</p>
+<ul>
+  <li><strong>Access</strong> a summary of the personal data we hold about you and the categories of recipients we have shared it with.</li>
+  <li><strong>Correct and complete</strong> inaccurate or misleading data — for identity fields such as your phone number this may require re-verification.</li>
+  <li><strong>Erase</strong> your data, and withdraw consent, subject to the retention we must observe for financial records, tax, fraud prevention, and legal claims. Withdrawing consent for optional analytics or personalised offers takes effect immediately and does not affect your account.</li>
+  <li><strong>Nominate</strong> another individual to exercise your rights in the event of your death or incapacity.</li>
+  <li><strong>Grieve</strong> — contact us first, then the Grievance Officer, and if still unresolved, the Data Protection Board of India.</li>
+</ul>
+<p>To exercise a right, use Profile → Support in the app or email <strong>[support email]</strong> from the address on your account. We verify your identity before responding, and we aim to respond within 30 days. We do not charge for a reasonable request, though we may charge for manifestly unfounded or repetitive ones.</p>
+<p>You can also change your analytics and personalisation preferences yourself at any time in the app, and delete your account as described in section 11.</p>
+
+<h2>11. Deleting your account</h2>
+<p>You can request deletion from inside the app (Profile → Delete account) or by following the instructions on the <a href="delete-account.html">account deletion page</a>. Deletion closes the account, forfeits unredeemed coins, and removes or irreversibly anonymises your identity data. We keep only what law requires — principally payout, tax, and fraud-prevention records — and those records are detached from your identity wherever that is possible.</p>
+
+<h2>12. Grievance Officer</h2>
+<p>
+  <strong>[Grievance Officer name]</strong><br>
+  [Legal entity name]<br>
+  [Postal address]<br>
+  Email: <strong>[grievance email]</strong><br>
+  Hours: Monday to Saturday, 10:00–19:00 IST
+</p>
+<p>We acknowledge a grievance within <strong>48 hours</strong> and aim to resolve it within <strong>15 days</strong>. If you are not satisfied, you may complain to the Data Protection Board of India.</p>
+
+<h2>13. Children</h2>
+<p>The Platform is for adults aged 18 and over. We do not knowingly collect personal data from anyone under 18 and we do not offer the service to them. Age is confirmed by your self-declaration at sign-up and may be re-checked before a payout. If you believe a person under 18 has created an account, tell us and we will close it and remove the data, unless a legal obligation requires us to keep a record of the closure.</p>
+
+<h2>14. Changes to this Notice</h2>
+<p>Each version carries an identifier and an effective date, shown above and in the app. Material changes are presented in the app for your acceptance before you continue, and your acceptance is recorded against that specific version. Older versions are retained and available on request. If you do not accept a new version, you must stop using the Platform.</p>
+
+<h2>15. Contact</h2>
+<p>
+  <strong>[Legal entity name]</strong><br>
+  [Registered address]<br>
+  Support and privacy requests: <strong>[support email]</strong><br>
+  Grievance Officer: <strong>[Grievance Officer name]</strong>, [grievance email]<br>
+  Terms of use: <a href="terms.html">Terms of Service</a>
+</p>
+
+<footer class="doc-foot">
+  <nav>
+    <a href="index.html">Legal hub</a>
+    <a href="terms.html">Terms of Service</a>
+    <a href="delete-account.html">Delete your account</a>
+  </nav>
+  <p>Play &amp; Earn Real Cash · Version <code>privacy-2026-10-08</code> · Effective 8 October 2026 · This Notice is written in plain language; the recorded version identifier is what your consent refers to.</p>
+</footer>
+
+</main>
+</body>
+</html>

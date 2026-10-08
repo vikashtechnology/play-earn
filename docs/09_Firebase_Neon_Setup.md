@@ -212,7 +212,9 @@ npm run config:check
 - [ ] Phone auth app verification enabled (Play Integrity), not just test numbers.
 - [ ] `JWT_SECRET` and `OTP_HASH_SECRET` are long random values, unique per environment.
 - [ ] Neon branch strategy decided (dev branch vs `main`), and migrations applied to each.
-- [ ] Reviewed `TERMS_URL` / `PRIVACY_URL` published with matching version strings.
+- [ ] Policy pages in `site/` have their bracketed placeholders filled in, have had a legal review, and are published (see `site/README.md`).
+- [ ] Reviewed `TERMS_URL` / `PRIVACY_URL` published with matching version strings — currently `terms-2026-10-08` and `privacy-2026-10-08`, printed on each page.
+- [ ] Each published policy URL actually loads over https (the API rejects `.example` hosts but cannot detect a 404).
 - [ ] `ACCOUNT_DELETION_URL` published (Play Store Data Safety requirement).
 - [ ] Anonymous and custom sign-in providers remain disabled in Firebase.
 - [ ] `npm test` and `npm run build` pass; `smoke:identity` passes against Neon.
