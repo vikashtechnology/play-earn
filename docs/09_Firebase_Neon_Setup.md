@@ -15,13 +15,16 @@ live sign-in: the API fails closed until these values are real.
    - Register the debug SHA-1 (and SHA-256) from `./gradlew signingReport`, plus
      release signing fingerprints before a closed test.
    - Download `google-services.json` and replace
-     `apps/android/app/google-services.json` (a placeholder is committed so the
-     project still builds).
+     `apps/android/app/google-services.json`. The committed file is the real
+     configuration for project `play-f9fe2` and package `com.zivora.app`.
 3. **Authentication → Sign-in method**, enable:
    - **Email link (passwordless)** — required for `emailLink` sign-in.
    - **Google** — set the support email; Firebase creates the web client ID for you.
-   - **Phone** — required for payout Minimum KYC. Enable Play Integrity app
-     verification (Android) and add test numbers only for local development.
+   - **Phone** — required for payout Minimum KYC, and for nothing else. Enable
+     Play Integrity app verification (Android) and add test numbers only for
+     local development. Phone is **not** a sign-in provider here: the API
+     rejects a phone-minted ID token at session exchange with
+     `phone_sign_in_not_allowed`, so an SMS OTP can never create an account.
    - Leave **Anonymous** disabled. The API rejects anonymous and custom tokens.
 4. **Authentication → Settings → Authorized domains**, add the domain that hosts
    your email sign-in links (the host in `EMAIL_LINK_URL`).
@@ -138,7 +141,7 @@ testing, and `main` stays clean.
 | `FIREBASE_AUTH_ENABLED` | master switch for token verification | `false` |
 | `FIREBASE_PROJECT_ID` | audience/issuer check for ID tokens | empty → verification disabled |
 | `FIREBASE_WEB_API_KEY` | optional Identity Toolkit lookups | empty → lookups disabled |
-| `FIREBASE_ALLOWED_SIGN_IN_PROVIDERS` | providers allowed to hold a wallet | `emailLink,password,google.com,phone.com` |
+| `FIREBASE_ALLOWED_SIGN_IN_PROVIDERS` | providers allowed to create or sign in to an account (never `phone.com`) | `emailLink,google.com` |
 | `SIGNUP_ENABLED` | allows account creation via Firebase | `false` |
 | `TERMS_VERSION` / `PRIVACY_VERSION` | versions the client must echo | empty → sign-in disabled |
 | `TERMS_URL` / `PRIVACY_URL` | published, reviewed policy pages | empty → sign-in disabled |
@@ -172,15 +175,17 @@ Sign-in is enabled only when **all** of these are true:
 
 Errors carry stable codes the app branches on: `invalid_firebase_token`,
 `consent_required`, `stale_policy_version`, `contact_verification_required`,
-`unsupported_sign_in_provider`, `account_conflict`, `identity_rate_limited`,
-`phone_verification_required`, `account_not_active`, `firebase_unavailable`,
-`firebase_sign_in_disabled`.
+`unsupported_sign_in_provider`, `phone_sign_in_not_allowed`, `account_conflict`,
+`identity_rate_limited`, `phone_verification_required`, `account_not_active`,
+`firebase_unavailable`, `firebase_sign_in_disabled`.
 
 Two claim details matter when testing against a real Firebase project:
 
 - Firebase ID tokens report phone auth as `firebase.sign_in_provider: "phone"`,
-  not `"phone.com"`. The API normalizes both, so the default allowlist works
-  either way.
+  not `"phone.com"`. The API normalizes both spellings, and rejects both at
+  session exchange: phone OTP is a withdrawal-time check only. A phone number
+  attached to an email-link or Google account is unaffected — that token still
+  reports the original provider, with `phone_number_verified: true`.
 - Minimum KYC requires `phone_number_verified: true` in the token. After a user
   links a phone credential, request a **forced** ID token refresh
   (`getIdToken(true)`) before calling the verify endpoint, otherwise the claim
@@ -213,6 +218,7 @@ npm run config:check
 - [ ] Debug **and** release SHA fingerprints registered in Firebase.
 - [ ] Email link domain authorized and serving the link (test on a real device).
 - [ ] Phone auth app verification enabled (Play Integrity), not just test numbers.
+- [ ] `FIREBASE_ALLOWED_SIGN_IN_PROVIDERS` does not contain `phone.com` (phone OTP is withdrawal-only).
 - [ ] `JWT_SECRET` and `OTP_HASH_SECRET` are long random values, unique per environment.
 - [ ] Neon branch strategy decided (dev branch vs `main`), and migrations applied to each.
 - [ ] Policy pages in `site/` have their bracketed placeholders filled in, have had a legal review, and are published (see `site/README.md`).

@@ -91,7 +91,7 @@ Add both to Firebase, and keep the keystore credentials outside the repository
 |---|---|---|
 | **Email link (passwordless)** | **Enable** | Primary sign-up path. Requires the authorized domain in Step 3. |
 | **Google** | **Enable** | Second sign-up path. Set the project support email; Firebase creates the web client automatically. |
-| **Phone** | **Enable** | Grants Minimum KYC for cash payouts. Turn on **Play Integrity** app verification for Android. |
+| **Phone** | **Enable** | **Withdrawal only.** Grants Minimum KYC for cash payouts; it is not a sign-in method. The API rejects a phone-minted ID token at session exchange with `phone_sign_in_not_allowed`, so keep `phone.com` out of `FIREBASE_ALLOWED_SIGN_IN_PROVIDERS`. Turn on **Play Integrity** app verification for Android. |
 | Email/Password | Leave **disabled** | Not used by the app. The server allowlist tolerates `password`, and unverified emails are rejected anyway, so enabling it adds no value. |
 | **Anonymous** | **Disabled** | The API refuses anonymous and custom tokens: every wallet must belong to a verifiable identity. |
 
@@ -243,6 +243,7 @@ minted for a different Firebase project), and `phone_verification_required`
 - [ ] Email link enabled
 - [ ] Google enabled with support email
 - [ ] Phone enabled with Play Integrity; test numbers added for dev
+- [ ] `FIREBASE_ALLOWED_SIGN_IN_PROVIDERS` excludes `phone.com` (phone OTP is withdrawal-only)
 - [ ] Email/Password and Anonymous left disabled
 - [ ] Authorized domain added for `EMAIL_LINK_URL`, and the page live over HTTPS
 - [ ] App Check registered with Play Integrity

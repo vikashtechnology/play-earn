@@ -10,6 +10,7 @@ import {
   IdentityError,
   IdentityRateLimitError,
   InvalidFirebaseTokenError,
+  PhoneSignInNotAllowedError,
   PhoneVerificationRequiredError,
   StalePolicyVersionError,
   UnsupportedSignInProviderError,
@@ -251,6 +252,7 @@ test('Firebase session exchange maps identity errors to stable client codes', as
     [new IdentityRateLimitError(), 429, 'identity_rate_limited'],
     [new AccountNotActiveError(), 403, 'account_not_active'],
     [new PhoneVerificationRequiredError(), 400, 'phone_verification_required'],
+    [new PhoneSignInNotAllowedError(), 403, 'phone_sign_in_not_allowed'],
     [new IdentityError('Firebase Auth is temporarily unavailable. Please try again.', 'firebase_unavailable'), 503, 'firebase_unavailable'],
   ];
 

@@ -156,3 +156,16 @@ test('placeholder and policy-url helpers are exported for the config doctor', as
   assert.equal(isPublishedPolicyUrl('https://zivora.in/terms'), true);
   assert.equal(isPublishedPolicyUrl('https://zivora.example/terms'), false);
 });
+
+test('the default sign-in provider allowlist excludes phone OTP', () => {
+  // Phone verification is a withdrawal-time check (Minimum KYC), never a way to
+  // create or sign in to an account, so it is not a default provider.
+  const { config } = readConfig({
+    POSTGRES_URL: 'postgresql://app:secret@ep-pool-123456-pooler.ap-south-1.aws.neon.tech/neondb?sslmode=require',
+    MIGRATIONS_DATABASE_URL: 'postgresql://migrator:secret@ep-123456.ap-south-1.aws.neon.tech/neondb?sslmode=require',
+    FIREBASE_PROJECT_ID: 'zivora-prod',
+  });
+
+  assert.deepEqual(config.firebaseAllowedSignInProviders, ['emailLink', 'google.com']);
+  assert.equal(config.firebaseAllowedSignInProviders.includes('phone.com'), false);
+});

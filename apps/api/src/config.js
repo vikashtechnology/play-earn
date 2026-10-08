@@ -85,9 +85,13 @@ export const config = {
   // and is never sent to clients by this API.
   firebaseWebApiKey: env.FIREBASE_WEB_API_KEY ?? '',
   firebaseCertsUrl: env.FIREBASE_CERTS_URL ?? '',
+  // Providers that may create or sign in to an account. phone.com is excluded
+  // by default and rejected in domain/identity.js even if listed here: phone OTP
+  // is a withdrawal-time check (Minimum KYC), never a sign-in method. Add
+  // 'password' only if Email/Password is deliberately enabled in Firebase.
   firebaseAllowedSignInProviders: readList(
     env.FIREBASE_ALLOWED_SIGN_IN_PROVIDERS,
-    'emailLink,password,google.com,phone.com',
+    'emailLink,google.com',
   ),
 
   // Product/compliance gates.

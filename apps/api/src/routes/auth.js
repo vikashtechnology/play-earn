@@ -19,6 +19,7 @@ import {
   IdentityError,
   IdentityRateLimitError,
   InvalidFirebaseTokenError,
+  PhoneSignInNotAllowedError,
   PhoneVerificationRequiredError,
   StalePolicyVersionError,
   UnsupportedSignInProviderError,
@@ -145,6 +146,7 @@ function identityErrorStatus(error) {
   if (error instanceof IdentityRateLimitError) return 429;
   if (error instanceof AccountConflictError) return 409;
   if (error instanceof UnsupportedSignInProviderError) return 403;
+  if (error instanceof PhoneSignInNotAllowedError) return 403;
   if (error instanceof AccountNotActiveError) return 403;
   if (error instanceof ConsentRequiredError || error instanceof StalePolicyVersionError) return 400;
   if (error instanceof PhoneVerificationRequiredError) return 400;

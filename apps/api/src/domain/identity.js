@@ -1,5 +1,9 @@
 import { issueAccessToken } from '../security/session.js';
-import { assertSupportedSignInProvider, FirebaseAuthError } from '../services/firebaseAuth.js';
+import {
+  assertSupportedSignInProvider,
+  FirebaseAuthError,
+  normalizeSignInProvider,
+} from '../services/firebaseAuth.js';
 
 export class IdentityError extends Error {
   constructor(message, code = 'identity_error') {
@@ -18,6 +22,14 @@ export class InvalidFirebaseTokenError extends IdentityError {
 export class UnsupportedSignInProviderError extends IdentityError {
   constructor(message = 'This sign-in method is not accepted for Zivora accounts.') {
     super(message, 'unsupported_sign_in_provider');
+  }
+}
+
+// Phone OTP proves control of a SIM at one moment in time, not a durable
+// identity. It authorises a cash withdrawal (Minimum KYC) and nothing else.
+export class PhoneSignInNotAllowedError extends IdentityError {
+  constructor(message = 'Phone verification is used only to authorise a cash withdrawal. Sign in with an email link or Google.') {
+    super(message, 'phone_sign_in_not_allowed');
   }
 }
 
@@ -221,6 +233,24 @@ export function createIdentityService({
       const firebaseIdentity = await verifyFirebaseToken(idToken);
       const ipHash = hashOf(requestIpHash);
       const agentHash = hashOf(userAgentHash);
+
+      // Enforced in code, not left to FIREBASE_ALLOWED_SIGN_IN_PROVIDERS, so a
+      // configuration edit cannot silently turn SMS into a signup path. Accounts
+      // are created by email link or Google; a phone number is attached later,
+      // through the withdrawal flow, where it earns Minimum KYC.
+      if (normalizeSignInProvider(firebaseIdentity.signInProvider) === 'phone.com') {
+        await repository.recordAuthEvent({
+          firebaseUid: firebaseIdentity.uid,
+          eventType: 'session_exchange',
+          signInProvider: firebaseIdentity.signInProvider,
+          authTime: firebaseIdentity.authTime,
+          outcome: 'rejected',
+          reason: 'phone_sign_in_not_allowed',
+          requestIpHash: ipHash,
+          userAgentHash: agentHash,
+        });
+        throw new PhoneSignInNotAllowedError();
+      }
 
       try {
         assertSupportedSignInProvider(firebaseIdentity, allowedSignInProviders);

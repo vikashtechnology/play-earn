@@ -177,7 +177,7 @@ function checkSecrets() {
       block('OTP_DELIVERY_ENABLED=true but OTP_PROVIDER_API_KEY is a placeholder', 'Set the Fast2SMS key or leave delivery disabled.');
     }
   } else {
-    ok('Legacy Fast2SMS OTP delivery is disabled (Firebase phone auth is primary)');
+    ok('Legacy Fast2SMS OTP delivery is disabled (Firebase phone auth handles withdrawal verification)');
   }
 }
 
@@ -209,9 +209,19 @@ function checkFirebase() {
       'Anonymous and custom tokens must never hold a wallet. Remove them.',
     );
   } else if (providers.length === 0) {
-    block('FIREBASE_ALLOWED_SIGN_IN_PROVIDERS is empty', 'Use emailLink,password,google.com,phone.com.');
+    block('FIREBASE_ALLOWED_SIGN_IN_PROVIDERS is empty', 'Use emailLink,google.com.');
   } else {
     ok(`Allowed sign-in providers: ${providers.join(', ')}`);
+  }
+
+  // Phone OTP is a withdrawal-time check (Minimum KYC), never a sign-in method.
+  // domain/identity.js rejects a phone-minted token even when phone.com is
+  // listed here, so listing it is a configuration mistake worth surfacing.
+  if (providers.some((provider) => provider === 'phone.com' || provider === 'phone')) {
+    warn(
+      'FIREBASE_ALLOWED_SIGN_IN_PROVIDERS lists phone, which the API ignores',
+      'Phone verification authorises cash withdrawals only. Remove phone.com; accounts are created by email link or Google.',
+    );
   }
 
   if (isPlaceholder(config.firebaseWebApiKey)) {

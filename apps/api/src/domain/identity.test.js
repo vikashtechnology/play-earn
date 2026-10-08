@@ -11,6 +11,7 @@ import {
   IdentityError,
   IdentityRateLimitError,
   InvalidFirebaseTokenError,
+  PhoneSignInNotAllowedError,
   PhoneVerificationRequiredError,
   StalePolicyVersionError,
   UnsupportedSignInProviderError,
@@ -431,9 +432,43 @@ test('two Firebase accounts cannot share one email address', async () => {
   assert.equal(repository.users.size, 1);
 });
 
-test('phone sign-in creates the account with a verified phone but no Minimum KYC', async () => {
+test('phone OTP cannot create or sign in to an account', async () => {
   const repository = createFakeRepository();
   const service = createService({ repository, firebaseIdentity: PHONE_IDENTITY });
+
+  await assert.rejects(
+    () => service.exchangeFirebaseSession({ idToken: 'token', consent: validConsent() }),
+    PhoneSignInNotAllowedError,
+  );
+  assert.equal(repository.users.size, 0, 'an SMS OTP never provisions a wallet');
+
+  const event = repository.events.at(-1);
+  assert.equal(event.eventType, 'session_exchange');
+  assert.equal(event.outcome, 'rejected');
+  assert.equal(event.reason, 'phone_sign_in_not_allowed', 'the refusal is auditable');
+});
+
+test('phone OTP stays blocked even when the provider allowlist includes phone.com', async () => {
+  const repository = createFakeRepository();
+  const service = createService({
+    repository,
+    firebaseIdentity: PHONE_IDENTITY,
+    allowedSignInProviders: ['emailLink', 'google.com', 'phone.com'],
+  });
+
+  await assert.rejects(
+    () => service.exchangeFirebaseSession({ idToken: 'token', consent: validConsent() }),
+    PhoneSignInNotAllowedError,
+    'the rule lives in code so a configuration edit cannot reopen SMS signup',
+  );
+});
+
+test('a phone linked to an email or Google account still signs in, without Minimum KYC', async () => {
+  const repository = createFakeRepository();
+  const service = createService({
+    repository,
+    firebaseIdentity: { ...GOOGLE_IDENTITY, phoneNumber: '+919876543210', phoneVerified: true },
+  });
 
   const session = await service.exchangeFirebaseSession({ idToken: 'token', consent: validConsent() });
 
@@ -511,7 +546,17 @@ test('a phone already linked to another account cannot be reused for payouts', a
   const service = createService({ repository });
   const session = await service.exchangeFirebaseSession({ idToken: 'token', consent: validConsent() });
 
-  const otherService = createService({ repository, firebaseIdentity: PHONE_IDENTITY });
+  // The competing account signs in with Google and already holds that phone.
+  const otherService = createService({
+    repository,
+    firebaseIdentity: {
+      ...GOOGLE_IDENTITY,
+      uid: 'firebase-uid-other',
+      email: 'other@example.com',
+      phoneNumber: '+919876543210',
+      phoneVerified: true,
+    },
+  });
   await otherService.exchangeFirebaseSession({ idToken: 'other', consent: validConsent() });
 
   const linkedService = createService({
