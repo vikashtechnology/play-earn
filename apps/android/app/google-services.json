@@ -1,26 +1,37 @@
 {
   "project_info": {
-    "project_number": "000000000000",
-    "project_id": "REPLACE-WITH-YOUR-FIREBASE-PROJECT-ID",
-    "storage_bucket": "REPLACE-WITH-YOUR-FIREBASE-PROJECT-ID.appspot.com"
+    "project_number": "41843791180",
+    "firebase_url": "https://play-f9fe2-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "play-f9fe2",
+    "storage_bucket": "play-f9fe2.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "mobilesdk_app_id": "1:41843791180:android:bafa9c604bfd48219eabe9",
         "android_client_info": {
-          "package_name": "com.rewardsplatform.app"
+          "package_name": "com.playgames.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "41843791180-aenmlq2okckiee7ounn3t1bulbh6pacv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "REPLACE_WITH_YOUR_FIREBASE_WEB_API_KEY"
+          "current_key": "AIzaSyCTjgPvlJIF8V1qxK3CqYQYmKBQZ08nzRc"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "41843791180-aenmlq2okckiee7ounn3t1bulbh6pacv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
