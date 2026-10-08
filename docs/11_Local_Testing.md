@@ -121,26 +121,28 @@ misconfigured deploy fails loudly instead of serving empty data:
 npm run dev:api          # listens on the PORT in apps/api/.env (4000 by default)
 ```
 
-Then build the app. **The phone or emulator cannot use `localhost`** — that is
-the device itself, not your machine:
+Then build the app. The repository has **no Gradle wrapper**, so install Gradle
+8.11.1+ and use `gradle` (or run `gradle wrapper --gradle-version 8.11.1` once
+and commit it, after which `./gradlew` works). **The phone or emulator cannot use
+`localhost`** — that is the device itself, not your machine:
 
 ```sh
 cd apps/android
 
 # Physical device on the same Wi-Fi — use your machine's LAN IP:
-./gradlew :app:assembleDebug \
+gradle :app:assembleDebug \
   -PAPI_BASE_URL=http://192.168.1.20:4000 \
   -PGOOGLE_WEB_CLIENT_ID=41843791180-aenmlq2okckiee7ounn3t1bulbh6pacv.apps.googleusercontent.com \
   -PEMAIL_LINK_URL=https://auth.your-domain/verify-email
 
 # Android emulator — 10.0.2.2 is the host machine:
-./gradlew :app:assembleDebug \
+gradle :app:assembleDebug \
   -PAPI_BASE_URL=http://10.0.2.2:4000 \
   -PGOOGLE_WEB_CLIENT_ID=41843791180-aenmlq2okckiee7ounn3t1bulbh6pacv.apps.googleusercontent.com \
   -PEMAIL_LINK_URL=https://auth.your-domain/verify-email
 ```
 
-Install with `./gradlew :app:installDebug`, or drag the APK from
+Install with `gradle :app:installDebug`, or drag the APK from
 `app/build/outputs/apk/debug/` onto the device.
 
 Before this works end to end, the Firebase console needs the debug SHA-1 and the

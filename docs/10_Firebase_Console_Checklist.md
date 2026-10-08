@@ -53,7 +53,7 @@ Get the debug fingerprints:
 
 ```sh
 cd apps/android
-./gradlew signingReport
+gradle signingReport
 ```
 
 Copy **SHA-1** and **SHA-256** for the `debug` variant into
@@ -123,7 +123,7 @@ So before email sign-in can work you must:
    manifest intent filter:
 
    ```sh
-   ./gradlew :app:assembleDebug \
+   gradle :app:assembleDebug \
      -PAPI_BASE_URL=https://<your-api-host> \
      -PGOOGLE_WEB_CLIENT_ID=41843791180-aenmlq2okckiee7ounn3t1bulbh6pacv.apps.googleusercontent.com \
      -PEMAIL_LINK_URL=https://auth.<your-domain>/verify-email

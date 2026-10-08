@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "RewardsPlatform"
+rootProject.name = "Zivora"
 include(":app")

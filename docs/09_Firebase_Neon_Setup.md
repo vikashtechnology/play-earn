@@ -12,7 +12,7 @@ live sign-in: the API fails closed until these values are real.
 
 1. Create a project at https://console.firebase.google.com.
 2. **Add an Android app** with package name `com.zivora.app`.
-   - Register the debug SHA-1 (and SHA-256) from `./gradlew signingReport`, plus
+   - Register the debug SHA-1 (and SHA-256) from `gradle signingReport`, plus
      release signing fingerprints before a closed test.
    - Download `google-services.json` and replace
      `apps/android/app/google-services.json`. The committed file is the real
@@ -50,7 +50,7 @@ live sign-in: the API fails closed until these values are real.
 Build with:
 
 ```sh
-./gradlew :app:assembleDebug \
+gradle :app:assembleDebug \
   -PAPI_BASE_URL=https://your-api-host \
   -PGOOGLE_WEB_CLIENT_ID=your-web-client-id \
   -PEMAIL_LINK_URL=https://auth.your-domain.example/verify-email

@@ -14,10 +14,11 @@ Kotlin + Jetpack Compose Android application for **Zivora**, an India-first rewa
 - Open this directory in Android Studio.
 - Use JDK 17, Android SDK 36, and Gradle 8.11.1+ (Android Gradle Plugin 8.9.1).
 - `app/google-services.json` is committed for Firebase project `play-f9fe2` and registers `package_name: com.zivora.app`, matching this app's `applicationId` and `namespace`. If you ever change the applicationId, register the new package in Firebase and re-download the file — the google-services Gradle plugin matches on `applicationId` and fails the build with `No matching client found for package name` otherwise. `npm run config:check` verifies both the package and the project id. Remaining console setup (SHA fingerprints, sign-in providers, authorized domains, App Check, cleanup) is in `docs/10_Firebase_Console_Checklist.md`.
+- **There is no Gradle wrapper in this repository** (no `gradlew`, no `gradle/wrapper/`), so install Gradle 8.11.1+ yourself and invoke `gradle` — or generate the wrapper once with `gradle wrapper --gradle-version 8.11.1` and commit it. Linux setup end to end: `docs/12_Linux_Setup.md`.
 - Build with the environment properties you need:
 
 ```sh
-./gradlew :app:assembleDebug \
+gradle :app:assembleDebug \
   -PAPI_BASE_URL=http://10.0.2.2:4000 \
   -PGOOGLE_WEB_CLIENT_ID=your-web-client-id \
   -PEMAIL_LINK_URL=https://auth.your-domain.example/verify-email
