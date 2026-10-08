@@ -1,6 +1,6 @@
 # Android app
 
-Kotlin + Jetpack Compose Android application for **Play & Earn Real Cash**, an India-first rewards marketplace.
+Kotlin + Jetpack Compose Android application for **Zivora**, an India-first rewards marketplace.
 
 ## Stack
 

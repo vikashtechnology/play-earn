@@ -17,7 +17,7 @@ import {
   SUPPORTED_SIGN_IN_PROVIDERS,
 } from './firebaseAuth.js';
 
-const PROJECT_ID = 'play-earn-test-project';
+const PROJECT_ID = 'zivora-test-project';
 
 const hasOpenSsl = spawnSync('openssl', ['version'], { encoding: 'utf8' }).status === 0;
 

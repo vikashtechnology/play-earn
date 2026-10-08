@@ -28,15 +28,15 @@ test('runtime config reads Neon URLs, Firebase Auth settings, and port from envi
     POSTGRES_URL: 'postgresql://app:secret@ep-pool-123456-pooler.ap-south-1.aws.neon.tech/neondb?sslmode=require',
     MIGRATIONS_DATABASE_URL: 'postgresql://migrator:secret@ep-123456.ap-south-1.aws.neon.tech/neondb?sslmode=require',
     FIREBASE_AUTH_ENABLED: 'true',
-    FIREBASE_PROJECT_ID: 'play-earn-prod',
+    FIREBASE_PROJECT_ID: 'zivora-prod',
     FIREBASE_WEB_API_KEY: 'public-web-api-key',
     FIREBASE_ALLOWED_SIGN_IN_PROVIDERS: 'google.com, phone.com ,emailLink',
     SIGNUP_ENABLED: 'true',
     TERMS_VERSION: 'terms-2026-10-01',
     PRIVACY_VERSION: 'privacy-2026-10-01',
     MINIMUM_USER_AGE: '18',
-    SUPPORT_EMAIL: 'support@playearn.example',
-    ACCOUNT_DELETION_URL: 'https://playearn.example/delete-account',
+    SUPPORT_EMAIL: 'support@zivora.example',
+    ACCOUNT_DELETION_URL: 'https://zivora.example/delete-account',
   });
 
   assert.equal(config.port, 4317);
@@ -51,10 +51,10 @@ test('runtime config reads Neon URLs, Firebase Auth settings, and port from envi
   );
   assert.equal(config.authProvider, 'firebase');
   assert.equal(config.firebaseAuthEnabled, true);
-  assert.equal(config.firebaseProjectId, 'play-earn-prod');
+  assert.equal(config.firebaseProjectId, 'zivora-prod');
   assert.deepEqual(config.firebaseAllowedSignInProviders, ['google.com', 'phone.com', 'emailLink']);
   assert.equal(config.minimumUserAge, 18);
-  assert.equal(config.accountDeletionUrl, 'https://playearn.example/delete-account');
+  assert.equal(config.accountDeletionUrl, 'https://zivora.example/delete-account');
   assert.equal(firebaseConfigured, true);
 });
 
@@ -126,21 +126,21 @@ test('policy pages on reserved or example hosts count as unpublished', () => {
   const unpublished = [
     '',
     'https://your-domain.example/terms',
-    'https://playearn.example/terms',
+    'https://zivora.example/terms',
     'https://example.com/terms',
-    'http://playearn.in/terms',
+    'http://zivora.in/terms',
     'https://localhost/terms',
-    'https://playearn.invalid/terms',
+    'https://zivora.invalid/terms',
     'not a url',
   ];
   for (const url of unpublished) {
-    const values = readHelpers({ TERMS_URL: url, PRIVACY_URL: 'https://playearn.in/privacy' });
+    const values = readHelpers({ TERMS_URL: url, PRIVACY_URL: 'https://zivora.in/privacy' });
     assert.equal(values.policiesPublished, false, `${url || '(empty)'} must not count as published`);
   }
 
   const published = readHelpers({
-    TERMS_URL: 'https://playearn.in/terms',
-    PRIVACY_URL: 'https://playearn.in/privacy',
+    TERMS_URL: 'https://zivora.in/terms',
+    PRIVACY_URL: 'https://zivora.in/privacy',
   });
   assert.equal(published.policiesPublished, true);
 });
@@ -152,7 +152,7 @@ test('placeholder and policy-url helpers are exported for the config doctor', as
   assert.equal(isPlaceholderValue('your-firebase-project-id'), true);
   assert.equal(isPlaceholderValue('configure-after-fast2sms-and-DLT-approval'), true);
   assert.equal(isPlaceholderValue(''), true);
-  assert.equal(isPlaceholderValue('play-earn-prod'), false);
-  assert.equal(isPublishedPolicyUrl('https://playearn.in/terms'), true);
-  assert.equal(isPublishedPolicyUrl('https://playearn.example/terms'), false);
+  assert.equal(isPlaceholderValue('zivora-prod'), false);
+  assert.equal(isPublishedPolicyUrl('https://zivora.in/terms'), true);
+  assert.equal(isPublishedPolicyUrl('https://zivora.example/terms'), false);
 });

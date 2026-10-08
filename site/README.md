@@ -7,8 +7,8 @@ notice should not itself load third-party trackers.
 | File | Purpose | Env variable it satisfies |
 |---|---|---|
 | `index.html` | Legal hub / landing page | — |
-| `terms.html` | Terms of Service (`terms-2026-10-08`) | `TERMS_URL`, `TERMS_VERSION` |
-| `privacy.html` | Privacy Notice (`privacy-2026-10-08`) | `PRIVACY_URL`, `PRIVACY_VERSION` |
+| `terms.html` | Terms of Service (`terms-2026-10-08.2`) | `TERMS_URL`, `TERMS_VERSION` |
+| `privacy.html` | Privacy Notice (`privacy-2026-10-08.2`) | `PRIVACY_URL`, `PRIVACY_VERSION` |
 | `delete-account.html` | Account deletion, with and without the app | `ACCOUNT_DELETION_URL` |
 | `assets/policy.css` | Shared styling | — |
 
@@ -68,8 +68,8 @@ python3 -m http.server --directory site --bind 0.0.0.0 8080
 Then set the API environment (`apps/api/.env`):
 
 ```sh
-TERMS_VERSION=terms-2026-10-08
-PRIVACY_VERSION=privacy-2026-10-08
+TERMS_VERSION=terms-2026-10-08.2
+PRIVACY_VERSION=privacy-2026-10-08.2
 TERMS_URL=https://vikashtechnology.github.io/play-earn/terms.html
 PRIVACY_URL=https://vikashtechnology.github.io/play-earn/privacy.html
 ACCOUNT_DELETION_URL=https://vikashtechnology.github.io/play-earn/delete-account.html

@@ -1,4 +1,4 @@
-# Play & Earn Real Cash — Build Tasks
+# Zivora — Build Tasks
 
 This plan supersedes the earlier generic task list and follows the current PRD, implementation blueprint, coin economy, fraud, KYC, and support documents. Complete one numbered task at a time and update this file and `memory.md` at each milestone.
 

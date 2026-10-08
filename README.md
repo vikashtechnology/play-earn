@@ -1,4 +1,4 @@
-# Play & Earn Real Cash
+# Zivora
 
 An India-first rewards marketplace for verified offers, surveys, check-ins, brand deals, products, and eligible cash rewards. The offerwall is one earning area, not the app's primary identity.
 

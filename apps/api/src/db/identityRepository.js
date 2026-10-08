@@ -43,7 +43,7 @@ export function createIdentityRepository(pool) {
 
   async function provisionUser(client, identity, consent) {
     const fullName = identity.fullName?.trim() || identity.displayName?.trim()
-      || (identity.email ? identity.email.split('@')[0] : 'Play & Earn user');
+      || (identity.email ? identity.email.split('@')[0] : 'Zivora user');
 
     const result = await client.query(`
       INSERT INTO users (

@@ -36,7 +36,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:scheme="playearnrealcash"
+                    android:scheme="zivora"
                     android:host="auth"
                     android:path="/verify-email" />
             </intent-filter>

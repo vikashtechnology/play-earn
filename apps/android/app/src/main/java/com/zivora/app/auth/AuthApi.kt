@@ -62,7 +62,7 @@ data class CashWithdrawalResult(
 )
 
 /**
- * Talks to the Play & Earn API.
+ * Talks to the Zivora API.
  *
  * Authentication is Firebase: the app signs in with Firebase, then exchanges the
  * Firebase ID token for a short-lived platform API session token. Firebase

@@ -333,7 +333,7 @@ private fun AgeGateScreen(onContinueAsGuest: () -> Unit) {
 
     ScreenColumn {
         ScreenTitle(
-            eyebrow = "Play & Earn Real Cash",
+            eyebrow = "Zivora",
             title = "A rewards marketplace, built around verified activity.",
             supporting = "Browse as a guest. Cash payout availability depends on eligibility and verification; earnings are not guaranteed.",
         )
@@ -509,7 +509,7 @@ private fun HomeScreen(
 
     ScreenColumn(modifier) {
         ScreenTitle(
-            eyebrow = "Play & Earn Real Cash",
+            eyebrow = "Zivora",
             title = "Rewards beyond the offerwall.",
             supporting = "Discover verified offers, surveys, check-ins, and brand rewards. Cash payout availability depends on eligibility and verification.",
         )

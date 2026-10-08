@@ -170,7 +170,7 @@ export async function handleHomeProfileRoute(req, res, pathname, dependencies = 
           memberSince: profile.memberSince,
         },
         referral: {
-          code: `PEARN-${profile.id.replace(/-/g, '').slice(0, 8).toUpperCase()}`,
+          code: `ZIV-${profile.id.replace(/-/g, '').slice(0, 8).toUpperCase()}`,
           status: 'preview',
         },
         preferences: {

@@ -23,16 +23,16 @@ const enabledAuthConfig = {
   ...config,
   authProvider: 'firebase',
   firebaseAuthEnabled: true,
-  firebaseProjectId: 'play-earn-test-project',
+  firebaseProjectId: 'zivora-test-project',
   firebaseAllowedSignInProviders: ['google.com', 'phone.com', 'emailLink'],
   signupEnabled: true,
   googleSignInEnabled: true,
   minimumUserAge: 18,
   termsVersion: 'terms-2026-10-01',
   privacyVersion: 'privacy-2026-10-01',
-  termsUrl: 'https://playearn.in/terms',
-  privacyUrl: 'https://playearn.in/privacy',
-  supportEmail: 'support@playearn.example',
+  termsUrl: 'https://zivora.in/terms',
+  privacyUrl: 'https://zivora.in/privacy',
+  supportEmail: 'support@zivora.example',
   jwtSecret: TEST_JWT_SECRET,
   otpHashSecret: 'auth-route-hash-secret',
   otpDeliveryEnabled: false,
@@ -167,7 +167,7 @@ test('policies endpoint reports Firebase capabilities without leaking configurat
   assert.deepEqual(enabled.body.allowedSignInProviders, ['google.com', 'phone.com', 'emailLink']);
   assert.equal(enabled.body.termsVersion, 'terms-2026-10-01');
   assert.equal(enabled.body.minimumUserAge, 18);
-  assert.equal(enabled.raw.includes('play-earn-test-project'), false, 'project id must not be exposed');
+  assert.equal(enabled.raw.includes('zivora-test-project'), false, 'project id must not be exposed');
   assert.equal(enabled.raw.includes(config.jwtSecret), false);
 
   assert.equal(disabled.body.firebaseSignInEnabled, false);

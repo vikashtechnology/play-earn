@@ -13,7 +13,7 @@ val googleWebClientId = providers.gradleProperty("GOOGLE_WEB_CLIENT_ID").orElse(
 // as an authorized domain in the Firebase console and must redirect back into
 // the app. Override with -PEMAIL_LINK_URL=https://your-domain/auth/verify-email
 val emailLinkUrl = providers.gradleProperty("EMAIL_LINK_URL")
-    .orElse("https://playearn.example/auth/verify-email")
+    .orElse("https://auth.zivora.example/verify-email")
     .get()
 val emailLinkUri = URI.create(emailLinkUrl)
 
@@ -32,7 +32,7 @@ android {
         buildConfigField("String", "EMAIL_LINK_URL", "\"$emailLinkUrl\"")
 
         manifestPlaceholders["emailLinkScheme"] = emailLinkUri.scheme ?: "https"
-        manifestPlaceholders["emailLinkHost"] = emailLinkUri.host ?: "playearn.example"
+        manifestPlaceholders["emailLinkHost"] = emailLinkUri.host ?: "auth.zivora.example"
         manifestPlaceholders["emailLinkPath"] = emailLinkUri.path ?: "/auth/verify-email"
     }
 

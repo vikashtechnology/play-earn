@@ -11,10 +11,10 @@ const testConfig = {
   jwtSecret: TEST_JWT_SECRET,
   termsVersion: 'terms-2026-10-01',
   privacyVersion: 'privacy-2026-10-01',
-  termsUrl: 'https://playearn.in/terms',
-  privacyUrl: 'https://playearn.in/privacy',
-  supportEmail: 'support@playearn.example',
-  accountDeletionUrl: 'https://playearn.in/delete-account',
+  termsUrl: 'https://zivora.in/terms',
+  privacyUrl: 'https://zivora.in/privacy',
+  supportEmail: 'support@zivora.example',
+  accountDeletionUrl: 'https://zivora.in/delete-account',
 };
 
 function createMockResponse() {
@@ -154,11 +154,11 @@ test('profile route returns the Neon-backed identity, consent, and payout state'
   assert.equal(result.body.user.email, 'player@example.com');
   assert.equal(result.body.user.fullName, 'Test Player');
   assert.equal(result.body.user.minimumKycVerified, false);
-  assert.equal(result.body.referral.code, 'PEARN-USERABC1');
+  assert.equal(result.body.referral.code, 'ZIV-USERABC1');
   assert.equal(result.body.preferences.personalizedOffersOptIn, true);
   assert.equal(result.body.consent.refreshRequired, false);
-  assert.equal(result.body.support.email, 'support@playearn.example');
-  assert.equal(result.body.accountDeletion.url, 'https://playearn.in/delete-account');
+  assert.equal(result.body.support.email, 'support@zivora.example');
+  assert.equal(result.body.accountDeletion.url, 'https://zivora.in/delete-account');
   assert.equal(result.body.accountDeletion.available, false);
 });
 
@@ -180,7 +180,7 @@ test('profile route describes the signed-out state without a database round trip
   assert.equal(result.body.signedIn, false);
   assert.equal(result.body.user, null);
   assert.equal(result.body.referral, null);
-  assert.equal(result.body.consent.termsUrl, 'https://playearn.in/terms');
+  assert.equal(result.body.consent.termsUrl, 'https://zivora.in/terms');
   assert.deepEqual(result.dependencies.balancesCalls, []);
 });
 

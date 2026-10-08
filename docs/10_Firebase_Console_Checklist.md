@@ -38,7 +38,7 @@ from the same value:
 ```
 
 > ⚠️ **Branding:** `app_name` in `app/src/main/res/values/strings.xml` is still
-> "Play & Earn Real Cash", as are the legal pages in `site/` and the docs, while
+> "Zivora", as are the legal pages in `site/` and the docs, while
 > the package is now `com.zivora.app`. If Zivora is the public brand, decide
 > before launch — changing the name inside the published policy pages requires
 > bumping `TERMS_VERSION` and `PRIVACY_VERSION` so the app re-collects consent.
@@ -64,14 +64,14 @@ git-ignored via `*.jks`/`local.properties`; keep an offline backup, because
 losing it means losing the ability to update the app):
 
 ```sh
-keytool -genkeypair -v -keystore play-earn-release.jks -keyalg RSA -keysize 2048 \
-  -validity 10000 -alias play-earn
+keytool -genkeypair -v -keystore zivora-release.jks -keyalg RSA -keysize 2048 \
+  -validity 10000 -alias zivora
 ```
 
 Then get its fingerprints:
 
 ```sh
-keytool -list -v -keystore play-earn-release.jks -alias play-earn
+keytool -list -v -keystore zivora-release.jks -alias zivora
 ```
 
 Add both to Firebase, and keep the keystore credentials outside the repository
@@ -111,7 +111,7 @@ Email-link sign-in needs a real HTTPS page that receives the link and hands it
 back to the app. The current Gradle default is a placeholder:
 
 ```
-EMAIL_LINK_URL default = https://playearn.example/auth/verify-email   ← not a real host
+EMAIL_LINK_URL default = https://auth.zivora.example/verify-email   ← not a real host
 ```
 
 So before email sign-in can work you must:

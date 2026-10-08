@@ -47,7 +47,7 @@ import kotlinx.coroutines.launch
  * Firebase-backed sign-up and sign-in.
  *
  * Firebase performs the authentication (email link or Google). The resulting
- * Firebase ID token is exchanged with the Play & Earn API for a short-lived
+ * Firebase ID token is exchanged with the Zivora API for a short-lived
  * platform session, and consent captured here is stored server-side in Neon
  * against the exact policy versions the user saw.
  */

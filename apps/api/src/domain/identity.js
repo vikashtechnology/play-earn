@@ -16,7 +16,7 @@ export class InvalidFirebaseTokenError extends IdentityError {
 }
 
 export class UnsupportedSignInProviderError extends IdentityError {
-  constructor(message = 'This sign-in method is not accepted for Play & Earn accounts.') {
+  constructor(message = 'This sign-in method is not accepted for Zivora accounts.') {
     super(message, 'unsupported_sign_in_provider');
   }
 }

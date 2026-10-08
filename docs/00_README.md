@@ -1,4 +1,4 @@
-# Play & Earn Real Cash — India Rewards Marketplace Documentation
+# Zivora — India Rewards Marketplace Documentation
 
 **Market:** India-first, Android + Web Admin  
 **Model:** Rewards + offers + brand marketplace

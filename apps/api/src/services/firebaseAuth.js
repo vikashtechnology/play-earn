@@ -264,7 +264,7 @@ export function assertSupportedSignInProvider(identity, allowedProviders) {
   if (!identity.signInProvider || !allowed.includes(identity.signInProvider)) {
     throw new FirebaseAuthError(
       403,
-      'This sign-in method is not accepted for Play & Earn accounts',
+      'This sign-in method is not accepted for Zivora accounts',
       'unsupported_sign_in_provider',
     );
   }

@@ -8,7 +8,7 @@ test('email sender places code and one-time verification link in transactional m
   const senders = createVerificationEmailSenders({
     primaryApiKey: 'primary-test-key',
     fallbackApiKey: 'fallback-test-key',
-    from: 'Play & Earn <verify@example.com>',
+    from: 'Zivora <verify@example.com>',
     fetchImpl: async (url, options) => {
       request = { url, options };
       return { ok: true };
@@ -19,7 +19,7 @@ test('email sender places code and one-time verification link in transactional m
     email: 'person@example.com',
     fullName: 'Person',
     code: '123456',
-    verificationUrl: 'playearnrealcash://auth/verify-email?token=single-use',
+    verificationUrl: 'zivora://auth/verify-email?token=single-use',
   });
 
   assert.equal(request.url, 'https://api.resend.com/emails');
@@ -27,7 +27,7 @@ test('email sender places code and one-time verification link in transactional m
   const message = JSON.parse(request.options.body);
   assert.deepEqual(message.to, ['person@example.com']);
   assert.match(message.text, /123456/);
-  assert.match(message.text, /playearnrealcash:\/\/auth\/verify-email/);
+  assert.match(message.text, /zivora:\/\/auth\/verify-email/);
 });
 
 test('fallback link uses the independent fallback sender and safely errors when unconfigured', async () => {
@@ -35,7 +35,7 @@ test('fallback link uses the independent fallback sender and safely errors when 
   const senders = createVerificationEmailSenders({
     primaryApiKey: 'primary-test-key',
     fallbackApiKey: 'fallback-test-key',
-    from: 'Play & Earn <verify@example.com>',
+    from: 'Zivora <verify@example.com>',
     fetchImpl: async (_url, options) => {
       authorizations.push(options.headers.authorization);
       return { ok: true };
@@ -45,7 +45,7 @@ test('fallback link uses the independent fallback sender and safely errors when 
   await senders.sendFallbackLink({
     email: 'person@example.com',
     fullName: 'Person',
-    verificationUrl: 'playearnrealcash://auth/verify-email?token=single-use',
+    verificationUrl: 'zivora://auth/verify-email?token=single-use',
   });
   assert.equal(authorizations[0], 'Bearer fallback-test-key');
 
@@ -53,6 +53,6 @@ test('fallback link uses the independent fallback sender and safely errors when 
   await assert.rejects(() => missing.sendFallbackLink({
     email: 'person@example.com',
     fullName: 'Person',
-    verificationUrl: 'playearnrealcash://auth/verify-email?token=single-use',
+    verificationUrl: 'zivora://auth/verify-email?token=single-use',
   }), EmailDeliveryError);
 });

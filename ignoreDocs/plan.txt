@@ -1,4 +1,4 @@
-Play & Earn Real Cash — Complete Compliant Implementation Blueprint
+Zivora — Complete Compliant Implementation Blueprint
 Version: 2.0 | Date: 2026-10-05 | Market: India-first, Android + Web Admin
 
 Critical Positioning: This app is a rewards marketplace, NOT an "install apps for money" app. Offerwall is one module among many earning methods. All app/game install offers must redirect exclusively to the Google Play Store — no third-party APK sources, no direct APK downloads, no sideloading. AdMob revenue belongs entirely to the platform owner; users receive only non-monetary, in-app coins for watching rewarded ads. Cash/gift-card rewards come exclusively from offerwall/CPE campaigns, completely separated from AdMob.

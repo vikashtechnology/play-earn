@@ -43,14 +43,14 @@ export function createVerificationEmailSenders({
     async sendCode({ email, fullName, code, verificationUrl }) {
       await primarySend({
         to: email,
-        subject: 'Verify your Play & Earn Real Cash account',
+        subject: 'Verify your Zivora account',
         text: `Hello ${fullName},\n\nYour email verification code is ${code}. It expires in 10 minutes.\n\nIf you cannot use the code, verify using this one-time link (also expires in 10 minutes):\n${verificationUrl}\n\nIf you did not request this, ignore this email.`,
       });
     },
     async sendFallbackLink({ email, fullName, verificationUrl }) {
       await fallbackSend({
         to: email,
-        subject: 'Verify your Play & Earn Real Cash account',
+        subject: 'Verify your Zivora account',
         text: `Hello ${fullName},\n\nWe could not deliver a verification code. Use this one-time link to verify your email (expires in 10 minutes):\n${verificationUrl}\n\nIf you did not request this, ignore this email.`,
       });
     },
