@@ -3,11 +3,10 @@ import http from 'node:http';
 import { handleOffersRoute } from './routes/offers.js';
 import { handleAuthRoute, otpService, identityService as firebaseIdentityService } from './routes/auth.js';
 import { handleHomeProfileRoute } from './routes/homeProfile.js';
-import { handlePayoutsRoute } from './routes/payouts.js';
+import { handlePayoutsRoute, defaultPayoutDependencies } from './routes/payouts.js';
 import { handleProductsRoute } from './routes/products.js';
 import { handleRewardsRoute } from './routes/rewards.js';
 import { handleWalletRoute } from './routes/wallet.js';
-import { createIdentityRepository } from './db/identityRepository.js';
 import { createOfferRepository } from './db/offerRepository.js';
 import { createWalletRepository } from './db/walletRepository.js';
 import { pool } from './db.js';
@@ -22,15 +21,6 @@ function defaultHomeProfileDependencies() {
   };
 }
 
-function defaultPayoutDependencies() {
-  const identityRepository = createIdentityRepository(pool);
-
-  return {
-    identityRepository,
-    identity: firebaseIdentityService,
-  };
-}
-
 export function createApp({
   authService = otpService,
   identityService = firebaseIdentityService,
@@ -38,7 +28,7 @@ export function createApp({
   payoutDependencies = defaultPayoutDependencies(),
   homeProfileDependencies = defaultHomeProfileDependencies(),
 } = {}) {
-  return http.createServer(async (req, res) => {
+  async function routeRequest(req, res) {
     const url = new URL(req.url ?? '/', 'http://localhost');
 
     if (url.pathname === '/') {
@@ -110,5 +100,23 @@ export function createApp({
 
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ ok: false, error: 'Not found' }));
+  }
+
+  return http.createServer(async (req, res) => {
+    try {
+      await routeRequest(req, res);
+    } catch (error) {
+      // An exception escaping an async request handler is an unhandled
+      // rejection, which is fatal in Node: one bad request would take the API
+      // down for every user. Nothing internal is echoed to the client.
+      console.error('Unhandled route failure:', error instanceof Error ? error.stack : error);
+
+      if (!res.headersSent) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+      }
+      if (!res.writableEnded) {
+        res.end(JSON.stringify({ error: 'Internal server error' }));
+      }
+    }
   });
 }

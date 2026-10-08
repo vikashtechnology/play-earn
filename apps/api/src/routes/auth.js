@@ -25,6 +25,7 @@ import {
   UnsupportedSignInProviderError,
 } from '../domain/identity.js';
 import { verifyAccessToken } from '../security/session.js';
+import { isDatabaseUnavailableError } from '../db.js';
 
 // Legacy self-hosted phone OTP (Fast2SMS). Firebase phone auth is the primary
 // Minimum-KYC path; this stays available as a configured fallback only.
@@ -169,6 +170,16 @@ function sendIdentityError(res, error, fallbackMessage) {
   }
   if (error instanceof TypeError || error instanceof RangeError) {
     sendJson(res, 400, { error: error.message });
+    return;
+  }
+
+  // A database that cannot be reached is retryable, not a server bug, and the
+  // driver's message must never reach a client.
+  if (isDatabaseUnavailableError(error)) {
+    sendJson(res, 503, {
+      error: 'The service is temporarily unavailable. Please try again shortly.',
+      code: 'database_unavailable',
+    });
     return;
   }
 

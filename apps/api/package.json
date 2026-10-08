@@ -11,6 +11,7 @@
     "migrate": "node scripts/run-migrations.js",
     "migrate:check": "node scripts/run-migrations.js --check",
     "smoke:identity": "node scripts/smoke-identity.js",
+    "smoke:http": "node scripts/smoke-http.js",
     "config:check": "node scripts/check-config.js"
   },
   "dependencies": {

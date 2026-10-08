@@ -4,6 +4,7 @@ import { verifyAccessToken } from '../security/session.js';
 import { config } from '../config.js';
 import { pool } from '../db.js';
 import { createIdentityRepository } from '../db/identityRepository.js';
+import { isDatabaseUnavailableError } from '../db.js';
 
 const payoutStore = new Map();
 const idempotencyStore = new Map();
@@ -82,6 +83,13 @@ function isSessionRevoked(eligibility, session) {
 }
 
 function authorizeUser(req, requestedUserId, verifyToken) {
+  // A wiring mistake must degrade to a 500 response, never to a thrown
+  // TypeError: this function runs outside the route's try/catch, and an
+  // exception in an async request handler is fatal for the whole process.
+  if (typeof verifyToken !== 'function') {
+    return { status: 500, error: 'Sign-in verification is not configured on this server.' };
+  }
+
   const authorization = req.headers.authorization ?? '';
   const tokenMatch = authorization.match(/^Bearer\s+(.+)$/i);
   const session = tokenMatch ? verifyToken(tokenMatch[1]) : null;
@@ -91,7 +99,10 @@ function authorizeUser(req, requestedUserId, verifyToken) {
   return { session };
 }
 
-function defaultPayoutDependencies() {
+// Exported so app.js wires the same dependencies the route would choose for
+// itself. An incomplete copy in the caller silently removes verifyToken and
+// turns every authenticated request into a crash.
+export function defaultPayoutDependencies() {
   return {
     verifyToken: (token) => verifyAccessToken(token, config.jwtSecret, { scope: 'user' }),
     identityRepository: createIdentityRepository(pool),
@@ -177,6 +188,17 @@ export async function handlePayoutsRoute(req, res, userId, pathname, dependencie
       res.end(JSON.stringify({ payout: createdPayout }));
       return;
     } catch (error) {
+      // A database that cannot be reached is retryable, not a caller error, and
+      // the driver's message must never be sent to a client.
+      if (isDatabaseUnavailableError(error)) {
+        res.writeHead(503, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          error: 'Withdrawals are temporarily unavailable. Please try again shortly.',
+          code: 'database_unavailable',
+        }));
+        return;
+      }
+
       const message = error instanceof Error ? error.message : 'unknown payout error';
       res.writeHead(400, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: message }));
